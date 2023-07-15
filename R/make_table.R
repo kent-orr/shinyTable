@@ -15,7 +15,7 @@ get_column_input_type <- function(column_class) {
 }
 
 
-#' Title
+#' Create an editable HTML table
 #'
 #' @param x a data.frame or reactive object
 #' @param table_id the id of the table, defaults to x
@@ -34,6 +34,7 @@ table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list
   
   data.table::setDT(x)
   
+  # Create the table headers (thead)
   th <- names(x) |> lapply(\(nm) {
     j = which(nm == names(x))
     
@@ -44,7 +45,10 @@ table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list
     }
     }) |> tags$thead()
   
+  # Guess column input types
   col_types = lapply(x, \(y) get_column_input_type(class(y)))
+  
+  # Override guessed column types with the ones specified in type_list
   if (!is.null(type_list)) {
     nm = names(type_list)
     for (i in seq_along(type_list)) {
@@ -52,27 +56,33 @@ table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list
     }
   }
   
-  tb <-
-    tags$tbody(lapply(1:nrow(x), \(i) {
-      tags$tr(lapply(1:ncol(x), \(j) {
-        
-        if (j %in% id_cols) {
-          tags$td(x[i][[j]], i = i, j = j, class="shinyTable-input")
-        } else if (j %in% skip_cols) {
-          # tags$td(style = "width:0px;")
-        } else {
-          tags$td(
-            tags$input(type = col_types[j]
-                       , value = x[i][[j]], i = i, j = j
-                       , class="shinyTable-input"
-                       , table = table_id
-                       ) # end input
-                , class="shinyTable") # end td
-        }
-        
-      }), class="shinyTable") # end tr
-    }), class="shinyTable") # end tbody
+  # Create the table body (tbody)
+  tb <- tags$tbody(lapply(1:nrow(x), \(i) {
+    tags$tr(lapply(1:ncol(x), \(j) {
+      
+      # Create input cells for columns specified in id_cols
+      if (j %in% id_cols) {
+        tags$td(x[i][[j]], i = i, j = j, class="shinyTable-input")
+      } 
+      # Skip columns specified in skip_cols
+      else if (j %in% skip_cols) {
+        # tags$td(style = "width:0px;")
+      } 
+      # Create input cells for other columns
+      else {
+        tags$td(
+          tags$input(type = col_types[j]
+                     , value = x[i][[j]], i = i, j = j
+                     , class="shinyTable-input"
+                     , table = table_id
+          ) # end input
+          , class="shinyTable") # end td
+      }
+      
+    }), class="shinyTable") # end tr
+  }), class="shinyTable") # end tbody
   
+  # Create the complete table
   tags$table(th, tb, id = paste("st", table_id, sep = "_"))
   
 }
