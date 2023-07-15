@@ -60,9 +60,9 @@ table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list
   tb <- tags$tbody(lapply(1:nrow(x), \(i) {
     tags$tr(lapply(1:ncol(x), \(j) {
       
-      # Create input cells for columns specified in id_cols
+      # Create plain text columns for id cols
       if (j %in% id_cols) {
-        tags$td(x[i][[j]], i = i, j = j, class="shinyTable-input")
+        tags$td(x[i][[j]], i = i, j = j, class="shinyTable")
       } 
       # Skip columns specified in skip_cols
       else if (j %in% skip_cols) {
