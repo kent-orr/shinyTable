@@ -74,8 +74,9 @@ table_html <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_c
       } 
       # Create input cells for other columns
       else {
-        tags$td(
-          tags$input(type = col_types[j]
+        tags$td( 
+          # input types like checkbo use different attributes for checked and unchecked. Perhaps a switch statement here. 
+          tags$input(type = col_types[j] 
                      , value = x[i][[j]], i = i, j = j
                      , class="shinyTable-input"
                      , table = table_id
