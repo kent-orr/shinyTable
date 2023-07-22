@@ -26,11 +26,15 @@ get_column_input_type <- function(column_class) {
 #' @export
 #'
 #' @examples
-table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list = NULL, ...) {
+shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_cols = NULL, id = NULL, ...) {
+  # browser()
   if (shiny::is.reactive(x)) x = x()
   
   if (is.null(table_id))
     table_id = deparse(substitute(x))
+  
+  if (!is.null(id))
+    table_id = paste(id, table_id, sep = "-")
   
   data.table::setDT(x)
   
@@ -70,8 +74,9 @@ table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list
       } 
       # Create input cells for other columns
       else {
-        tags$td(
-          tags$input(type = col_types[j]
+        tags$td( 
+          tags$input(type = col_types[j] 
+                     , checked = if ( col_types[j] %in% c("radio", "checkbox")) checked = x[i][[j]]
                      , value = x[i][[j]], i = i, j = j
                      , class="shinyTable-input"
                      , table = table_id
@@ -86,27 +91,34 @@ table_html <- function(x, id_cols = 1, skip_cols = 2, table_id = NULL, type_list
   tagList(
     tags$table(th, tb, id = paste("st", table_id, sep = "_"))
     , tags$script(HTML('function handleInputChange(event) {
-  const input = event.target;
-  const i = parseInt(input.getAttribute("i"));
-  const j = parseInt(input.getAttribute("j"));
-  const tab = input.getAttribute("table")
-  const value = input.value;
-  
-  Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab})
-  
-  console.log("i:", i);
-  console.log("j:", j);
-  console.log("value:", value);
-}
-
-// Attach event listener to all input elements with the class "shinyTable-input"
-document.querySelectorAll(".shinyTable-input").forEach(input => {
-  input.addEventListener("change", handleInputChange);
-});'))
+      const input = event.target;
+      const i = parseInt(input.getAttribute("i"));
+      const j = parseInt(input.getAttribute("j"));
+      const tab = input.getAttribute("table");
+      if (input.type === "checkbox" | input.type === "radio") {
+        var value = input.checked;
+      } else {
+        var value = input.value;
+      }
+      
+      if (typeof Shiny !== "undefined") {
+        Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab}, {priority: "event"});
+        };
+      
+      console.log(input.type);
+      console.log("i:", i);
+      console.log("j:", j);
+      console.log("value:", value);
+    }
+    
+    // Attach event listener to all input elements with the class "shinyTable-input"
+    document.querySelectorAll(".shinyTable-input").forEach(input => {
+      input.addEventListener("change", handleInputChange);
+    });'
+                       ))
   )
-  
 }
-
-table_html(mtcars[1:3, 1:3], table_id = "test") |> htmltools::html_print()
+ y= mtcars[1:3, 1:3]; y$newcol = TRUE; y$datetime = Sys.Date()
+shiny_table(y, table_id = "test") |> htmltools::html_print()
 
 
