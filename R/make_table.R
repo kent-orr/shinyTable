@@ -22,14 +22,17 @@ get_column_input_type <- function(column_class) {
 #'
 #' @param x a data.frame or reactive object
 #' @param table_id the id of the table, defaults to x
+#' @param id_cols a numeric vector of columns that are displayed as static text
 #' @param type_list list of column input types of the format `list(text = 2, checkbox = c(3, 5))`. Columns are guessed by `shinyTable:::get_column_input_type`. Arguments override guesses
-#' @param ... 
+#' @param skip_cols a numeric vector of columns to skip
+#' @param id if used in a shiny module, the module id
+#' @param ... not used yet but don't knock it
 #'
 #' @return
 #' @export
 #'
 #' @examples
-shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_cols = NULL, id = NULL, ...) {
+shiny_table <- function(x, table_id = NULL, id_cols = 1, type_list = NULL, skip_cols = NULL, id = NULL, ...) {
   # browser()
   if (shiny::is.reactive(x)) x = x()
   
@@ -102,49 +105,7 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
   # Create the complete table
   tagList(
     tags$table(th, tb, id = paste("st", table_id, sep = "_"))
-    , tags$script(HTML('function handleInputChange(event) {
-      const input = event.target;
-      const i = parseInt(input.getAttribute("i"));
-      const j = parseInt(input.getAttribute("j"));
-      const tab = input.getAttribute("table");
-      
-      if (!input.checkValidity()) {
-        input.value = null;
-        return 0;
-      }
-      
-      switch(input.type) {
-        case "checkbox" | "radio":
-        var value = input.checked;
-        break;
-        
-        case "date":
-        var value = Math.round(input.valueAsNumber / (1000 * 60 * 60 * 24));
-        break;
-        
-        case "datetime-local":
-        var value = Math.round(input.valueAsNumber / 1000);
-        break;
-        
-        default: 
-        var value = input.value
-      }
-      
-      if (typeof Shiny !== "undefined") {
-        Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab}, {priority: "event"});
-        };
-      
-      console.log(input.type);
-      console.log("i:", i);
-      console.log("j:", j);
-      console.log("value:", value);
-    }
-    
-    // Attach event listener to all input elements with the class "shinyTable-input"
-    document.querySelectorAll(".shinyTable-input").forEach(input => {
-      input.addEventListener("change", handleInputChange);
-    });'
-                       ))
+    , js_handle_input_change
   )
 }
 # y= mtcars[1:2, 1:3]; y$newcol = c(TRUE, FALSE); y$datetime = Sys.time(); y$phone = ""
