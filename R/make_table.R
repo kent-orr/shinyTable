@@ -1,6 +1,9 @@
 # x = mtcars
 
 get_column_input_type <- function(column_class) {
+  if (any(column_class %in% c("POSIXct", "POSIXt")))
+    column_class = "POSIXct"
+  
   switch(column_class,
          character = "text",
          factor = "text",
@@ -74,7 +77,7 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
       } 
       # Create input cells for other columns
       else {
-        tags$td( 
+        tags$td(i = i, j = j, 
           tags$input(type = col_types[j] 
                      , checked = if ( col_types[j] %in% c("radio", "checkbox")) checked = x[i][[j]]
                      , value = x[i][[j]], i = i, j = j
@@ -95,10 +98,22 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
       const i = parseInt(input.getAttribute("i"));
       const j = parseInt(input.getAttribute("j"));
       const tab = input.getAttribute("table");
-      if (input.type === "checkbox" | input.type === "radio") {
+      
+      switch(input.type) {
+        case "checkbox" | "radio":
         var value = input.checked;
-      } else {
-        var value = input.value;
+        break;
+        
+        case "date":
+        var value = Math.round(input.valueAsNumber / (1000 * 60 * 60 * 24));
+        break;
+        
+        case "date-time-local":
+        var value = Math.round(input.valueAsNumber / (1000));
+        break;
+        
+        default: 
+        var value = input.value
       }
       
       if (typeof Shiny !== "undefined") {
