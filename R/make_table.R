@@ -26,7 +26,7 @@ get_column_input_type <- function(column_class) {
 #' @export
 #'
 #' @examples
-table_html <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_cols = NULL, id = NULL, ...) {
+shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_cols = NULL, id = NULL, ...) {
   # browser()
   if (shiny::is.reactive(x)) x = x()
   
@@ -75,8 +75,8 @@ table_html <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_c
       # Create input cells for other columns
       else {
         tags$td( 
-          # input types like checkbo use different attributes for checked and unchecked. Perhaps a switch statement here. 
           tags$input(type = col_types[j] 
+                     , checked = if ( col_types[j] %in% c("radio", "checkbox")) checked = x[i][[j]]
                      , value = x[i][[j]], i = i, j = j
                      , class="shinyTable-input"
                      , table = table_id
@@ -95,16 +95,17 @@ table_html <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_c
       const i = parseInt(input.getAttribute("i"));
       const j = parseInt(input.getAttribute("j"));
       const tab = input.getAttribute("table");
-      var value = input.value;
-      
-      if (value === "TRUE") {value = true}
-      if (value === "FALSE") {value = false}
+      if (input.type === "checkbox" | input.type === "radio") {
+        var value = input.checked;
+      } else {
+        var value = input.value;
+      }
       
       if (typeof Shiny !== "undefined") {
         Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab}, {priority: "event"});
         };
       
-      
+      console.log(input.type);
       console.log("i:", i);
       console.log("j:", j);
       console.log("value:", value);
@@ -117,7 +118,7 @@ table_html <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_c
                        ))
   )
 }
- y= mtcars[1:3, 1:3]; y$newcol = TRUE
-table_html(y, table_id = "test") |> htmltools::html_print()
+ y= mtcars[1:3, 1:3]; y$newcol = TRUE; y$datetime = Sys.Date()
+shiny_table(y, table_id = "test") |> htmltools::html_print()
 
 
