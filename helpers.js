@@ -7,6 +7,13 @@ function col_apply(table_id, col, f) {
   xh.forEach(f);
 }
 
+function inp_apply(table_id, col, f) {
+  var table_id = "#st_" + table_id;
+  var xd = document.querySelectorAll(table_id + " input[j='" + col + "']");
+  
+  xd.forEach(f);
+}
+
 function handleInputChange(event) {
   const input = event.target;
   const i = input.getAttribute("i");

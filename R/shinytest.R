@@ -63,10 +63,10 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  y= mtcars[1:3, 1:3]; y$newcol = TRUE; y$datetime = Sys.Date()
+  y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = Sys.time()
   x = shinyTableServer("a", y,  table_id = "test_table", id_cols = 1)
   output$main_console <- renderPrint(x())
 }
 
-shiny::shinyApp(ui, server)
+# shiny::shinyApp(ui, server)
 

@@ -79,8 +79,17 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
       else {
         tags$td(i = i, j = j, 
           tags$input(type = col_types[j] 
-                     , checked = if ( col_types[j] %in% c("radio", "checkbox")) checked = x[i][[j]]
-                     , value = x[i][[j]], i = i, j = j
+                     , checked = if (col_types[j] %in% c("radio", "checkbox") && x[i][[j]]) x[i][[j]] else NULL
+                     , pattern = if (col_types[j] == "tel") "[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                     , placeholder = if (col_types[j] == "tel") "555-55-5555"
+                     
+                     , value = if (col_types[j] == "datetime-local") {
+                       lubridate::format_ISO8601(x[i][[j]]) 
+                     } else {
+                       x[i][[j]] 
+                     } 
+                     
+                     , i = i, j = j
                      , class="shinyTable-input"
                      , table = table_id
           ) # end input
@@ -99,6 +108,11 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
       const j = parseInt(input.getAttribute("j"));
       const tab = input.getAttribute("table");
       
+      if (!input.checkValidity()) {
+        input.value = null;
+        return 0;
+      }
+      
       switch(input.type) {
         case "checkbox" | "radio":
         var value = input.checked;
@@ -108,8 +122,8 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
         var value = Math.round(input.valueAsNumber / (1000 * 60 * 60 * 24));
         break;
         
-        case "date-time-local":
-        var value = Math.round(input.valueAsNumber / (1000));
+        case "datetime-local":
+        var value = Math.round(input.valueAsNumber / 1000);
         break;
         
         default: 
@@ -133,7 +147,7 @@ shiny_table <- function(x, table_id = NULL, type_list = NULL, id_cols = 1, skip_
                        ))
   )
 }
- y= mtcars[1:3, 1:3]; y$newcol = TRUE; y$datetime = Sys.Date()
-shiny_table(y, table_id = "test") |> htmltools::html_print()
+# y= mtcars[1:2, 1:3]; y$newcol = c(TRUE, FALSE); y$datetime = Sys.time(); y$phone = ""
+# shiny_table(y, table_id = "test", type_list = list(tel = 6)) |> htmltools::html_print()
 
 
