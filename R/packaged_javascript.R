@@ -4,29 +4,41 @@
 #' the table is generated.
 #' 
 #' @export
-js_handle_input_change <- tags$script(HTML(
+js_handle_input_change <- HTML(
 'function handleInputChange(event) {
       const input = event.target;
       const i = parseInt(input.getAttribute("i"));
       const j = parseInt(input.getAttribute("j"));
       const tab = input.getAttribute("table");
       
-      if (!input.checkValidity()) {
-        input.value = null;
-        return 0;
+      var validity_exemptions = ["datetime-local", "date"];
+      
+      if (!validity_exemptions.includes(input.type)) {
+       if (!input.checkValidity()) {
+          input.value = null;
+          return 0;
+       }
       }
       
       switch(input.type) {
-        case "checkbox" | "radio":
+        case "checkbox":
+        console.log(input.checked);
+        var value = input.checked;
+        break;
+        
+        case "radio":
+        console.log(input.checked);
         var value = input.checked;
         break;
         
         case "date":
         var value = Math.round(input.valueAsNumber / (1000 * 60 * 60 * 24));
+        if (value === "") value = NaN
         break;
         
         case "datetime-local":
         var value = Math.round(input.valueAsNumber / 1000);
+        if (value === "") value = NaN
         break;
         
         default: 
@@ -47,4 +59,4 @@ js_handle_input_change <- tags$script(HTML(
     document.querySelectorAll(".shinyTable-input").forEach(input => {
       input.addEventListener("change", handleInputChange);
     });'
-))
+)
