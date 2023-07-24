@@ -45,6 +45,7 @@ shinyTableServer <- function(id
         l = input[[table_id]]
         i = l$i; j = l$j; value = l$value
         # browser()
+        if (is.null(value)) value = NA
         x[i][[j]] <- value
         current(x)
         
@@ -68,5 +69,11 @@ server <- function(input, output, session) {
   output$main_console <- renderPrint(x())
 }
 
-# shiny::shinyApp(ui, server)
+#' Run a test of the shiny table
+#' 
+#' @export
+run_test <- function() {
+  shiny::shinyApp(ui, server)
+}
+
 

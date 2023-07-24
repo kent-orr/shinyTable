@@ -5,7 +5,7 @@
 \alias{js_handle_input_change}
 \title{Handle input change javascript}
 \format{
-An object of class \code{shiny.tag} of length 3.
+An object of class \code{html} (inherits from \code{character}) of length 1.
 }
 \usage{
 js_handle_input_change

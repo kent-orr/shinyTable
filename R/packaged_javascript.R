@@ -5,7 +5,7 @@
 #' 
 #' @export
 js_handle_input_change <- HTML(
-'function handleInputChange(event) {
+r'(function handleInputChange(event) {
       const input = event.target;
       const i = parseInt(input.getAttribute("i"));
       const j = parseInt(input.getAttribute("j"));
@@ -42,7 +42,11 @@ js_handle_input_change <- HTML(
         break;
         
         default: 
-        var value = input.value
+        var value = input.value;
+        var col_inputs = document.querySelectorAll("#st_" + tab + " input[j='" + j + "']");
+        col_array = [];
+        col_inputs.forEach(x => col_array.push(x.value.length));
+        col_inputs.forEach(x => x.size = 3 + Math.max.apply(Math, col_array));
       }
       
       if (typeof Shiny !== "undefined") {
@@ -58,5 +62,5 @@ js_handle_input_change <- HTML(
     // Attach event listener to all input elements with the class "shinyTable-input"
     document.querySelectorAll(".shinyTable-input").forEach(input => {
       input.addEventListener("change", handleInputChange);
-    });'
+    });)'
 )

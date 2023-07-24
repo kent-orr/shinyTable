@@ -1,5 +1,29 @@
-# x = mtcars
-
+#' Get the input type for a given column class.
+#'
+#' This function maps a given column class to an appropriate input type for HTML forms.
+#' The input type is selected based on the column class and is returned as a character string.
+#' If the column class is "character" or "factor", the input type will be "text".
+#' If the column class is "logical", the input type will be "checkbox".
+#' If the column class is "integer" or "numeric", the input type will be "number".
+#' If the column class is "Date", the input type will be "date".
+#' If the column class is "POSIXct" or "POSIXt", the input type will be "datetime-local".
+#' If the column class is "times", the input type will be "time".
+#' For any other column class, the default input type will be "text".
+#'
+#' @param column_class A character string specifying the class of the column.
+#'
+#' @return A character string representing the input type for the given column class.
+#'
+#' @examples
+#' # Example 1
+#' get_column_input_type("character")
+#' # Output: "text"
+#' 
+#' # Example 2
+#' get_column_input_type("numeric")
+#' # Output: "number"
+#'
+#' @export
 get_column_input_type <- function(column_class) {
   if (any(column_class %in% c("POSIXct", "POSIXt")))
     column_class = "POSIXct"
@@ -17,6 +41,50 @@ get_column_input_type <- function(column_class) {
   )
 }
 
+#' Generate input tags based on column types.
+#'
+#' This function generates input tags based on the column types specified in the \code{col_types} argument.
+#' The generated input tag is determined by the column type \code{col_types[[j]]} and is adjusted
+#' according to the specific conditions for certain types.
+#'
+#' @param col_types A character vector specifying the types of columns.
+#' @param x A data structure containing the data for the specified column.
+#' @param i An integer index indicating the row number.
+#' @param j An integer index indicating the column number.
+#' @param table_id A character string representing the table identifier.
+#' 
+#' @export
+generate_tags_input <- function(col_types, x, i, j, table_id) {
+  # browser()
+  type = col_types[[j]]
+  
+  value <- if (type == "datetime-local") {
+    lubridate::format_ISO8601(x[i][[j]])
+  } else {
+    x[i][[j]]
+  }
+  
+  size = 3 + max(nchar(x[[j]]))
+  
+  tags$input(type = type
+             , checked = if (type %in% c("radio", "checkbox") && x[i][[j]]) {
+               x[i][[j]]
+             } else {
+               NULL
+             } # end checked
+             , pattern = if (type == "tel") {"[0-9]{3}-[0-9]{3}-[0-9]{4}"
+             } else {
+               NULL
+             } # end NULL
+             , placeholder = if (type == "tel") {"555-55-5555"
+             } else {
+               NULL
+             } # end placeholder
+             , value = value,
+             i = i, j = j, class = "shinyTable-input", table = table_id,
+             size = size,
+             style='transition: size 5s;position: relative;')
+}
 
 #' Create an editable HTML table
 #'
@@ -47,9 +115,8 @@ shiny_table <- function(x, table_id = NULL, id_cols = 1, type_list = NULL, skip_
   # Create the table headers (thead)
   th <- names(x) |> lapply(\(nm) {
     j = which(nm == names(x))
-    
     if (j %in% skip_cols) {
-      # tags$th(style="wdth:0px;")
+      NULL
     } else {
       tags$th(nm, i = 0, j = j)
     }
@@ -80,34 +147,29 @@ shiny_table <- function(x, table_id = NULL, id_cols = 1, type_list = NULL, skip_
       } 
       # Create input cells for other columns
       else {
-        tags$td(i = i, j = j, 
-          tags$input(type = col_types[j] 
-                     , checked = if (col_types[j] %in% c("radio", "checkbox") && x[i][[j]]) x[i][[j]] else NULL
-                     , pattern = if (col_types[j] == "tel") "[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                     , placeholder = if (col_types[j] == "tel") "555-55-5555"
-                     
-                     , value = if (col_types[j] == "datetime-local") {
-                       lubridate::format_ISO8601(x[i][[j]]) 
-                     } else {
-                       x[i][[j]] 
-                     } 
-                     
-                     , i = i, j = j
-                     , class="shinyTable-input"
-                     , table = table_id
-          ) # end input
+        tags$td(i = i, j = j,
+          generate_tags_input(col_types, x, i, j, table_id) # end input
           , class="shinyTable") # end td
+          
       }
       
     }), class="shinyTable") # end tr
   }), class="shinyTable") # end tbody
   
+  
+  # Create colgroups
+  tg = tags$colgroup(lapply(setdiff(1:ncol(x), skip_cols), \(j) {
+    tags$col(j=j)
+  }))
+  
   # Create the complete table
   tagList(
-    tags$table(th, tb, id = paste("st", table_id, sep = "_"))
-    , js_handle_input_change
+    tags$table(tg, th, tb, id = paste("st", table_id, sep = "_"), width="100%")
+    , tags$script(js_handle_input_change)
   )
 }
+
+# 
 # y= mtcars[1:2, 1:3]; y$newcol = c(TRUE, FALSE); y$datetime = Sys.time(); y$phone = ""
 # shiny_table(y, table_id = "test", type_list = list(tel = 6)) |> htmltools::html_print()
 

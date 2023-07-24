@@ -7,8 +7,8 @@
 shiny_table(
   x,
   table_id = NULL,
-  type_list = NULL,
   id_cols = 1,
+  type_list = NULL,
   skip_cols = NULL,
   id = NULL,
   ...
@@ -19,9 +19,15 @@ shiny_table(
 
 \item{table_id}{the id of the table, defaults to x}
 
+\item{id_cols}{a numeric vector of columns that are displayed as static text}
+
 \item{type_list}{list of column input types of the format \code{list(text = 2, checkbox = c(3, 5))}. Columns are guessed by \code{shinyTable:::get_column_input_type}. Arguments override guesses}
 
-\item{...}{}
+\item{skip_cols}{a numeric vector of columns to skip}
+
+\item{id}{if used in a shiny module, the module id}
+
+\item{...}{not used yet but don't knock it}
 }
 \description{
 Create an editable HTML table
