@@ -1,34 +1,16 @@
 
 
-#' UI for an interactive shinyTable module
-#'
-#' @param id module ID
-#'
-#' @export
-#'
-shinyTableUI <- function(id, verbose = interactive()) {
+shinyTableUI <- function(id) {
   ns <- NS(id)
   tagList(
     uiOutput(ns("out")  )
     , actionButton(ns("howdy"), "jey")
-    , if (verbose) verbatimTextOutput(ns("console"))
+    , verbatimTextOutput(ns("console"))
   )
 }
 
-#' Server logic for a shinyTable instance
-#'
-#' @param id module ID
-#' @param x a dataframe or reactive dataframe
-#' @param mode either "data.frame" or "inputs"
-#' @inheritParams shiny_table
-#'
-#' @return 
-#' @export
-#'
-#' @examples
 shinyTableServer <- function(id
                              , x
-                             , mode = "inputs"
                              , table_id = NULL
                              , id_cols = 1
                              , skip_cols = NULL
@@ -44,9 +26,7 @@ shinyTableServer <- function(id
       
       output$out <- renderUI({
         
-        shinyTable(x = init
-                   , mode = mode
-                   , table_id = table_id
+        shiny_table(x = init, table_id = table_id
                    , id_cols = id_cols
                    , skip_cols = skip_cols
                    , type_list = type_list
@@ -72,39 +52,27 @@ shinyTableServer <- function(id
         
       })
       
-      return_out <- reactive({
-        if (mode == "inputs") {
-          x = input[[table_id]]
-          x[[table]] = gsub(paste0(id, "-"), "", x[[table]])
-          x
-        } else if (mode == "data.frame") {
-          current
-        }
-      })
-      
-      return(return_out)
+      return(current)
       
     }
   )
 }
 
+ui <- fluidPage(
+  shinyTableUI("a")
+  , verbatimTextOutput("main_console")
+)
 
+server <- function(input, output, session) {
+  y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = Sys.time()
+  x = shinyTableServer("a", y,  table_id = "test_table", id_cols = 1)
+  output$main_console <- renderPrint(x())
+}
 
 #' Run a test of the shiny table
 #' 
 #' @export
-run_test <- function(mode = "data.frame") {
-  ui <- fluidPage(
-    shinyTableUI("a", verbose = TRUE)
-    , verbatimTextOutput("main_console")
-  )
-  
-  server <- function(input, output, session) {
-    y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = Sys.time()
-    x = shinyTableServer("a", y, mode = mode,  table_id = "test_table", id_cols = 1)
-    output$main_console <- renderPrint(x())
-  }
-  
+run_test <- function() {
   shiny::shinyApp(ui, server)
 }
 

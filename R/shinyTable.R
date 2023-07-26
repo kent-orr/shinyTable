@@ -100,7 +100,7 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 #' @export
 #'
 #' @examples
-shiny_table <- function(x,
+shinyTable <- function(x,
                        table_id = NULL,
                        id_cols = 1,
                        type_list = NULL,
