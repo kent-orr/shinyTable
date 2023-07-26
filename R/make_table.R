@@ -37,7 +37,7 @@ get_column_input_type <- function(column_class) {
          Date = "date",
          POSIXct = "datetime-local",
          times = "time",
-         default = "text"
+         "text"
   )
 }
 
@@ -57,7 +57,7 @@ get_column_input_type <- function(column_class) {
 generate_tags_input <- function(col_types, x, i, j, table_id) {
   # browser()
   type = col_types[[j]]
-  
+  data.table::setDT(x)
   value <- if (type == "datetime-local") {
     lubridate::format_ISO8601(x[i][[j]])
   } else {
@@ -100,7 +100,13 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 #' @export
 #'
 #' @examples
-shiny_table <- function(x, table_id = NULL, id_cols = 1, type_list = NULL, skip_cols = NULL, id = NULL, ...) {
+shiny_table <- function(x,
+                       table_id = NULL,
+                       id_cols = 1,
+                       type_list = NULL,
+                       skip_cols = NULL,
+                       id = NULL,
+                       ...) {
   # browser()
   if (shiny::is.reactive(x)) x = x()
   
