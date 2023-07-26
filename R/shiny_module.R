@@ -1,5 +1,5 @@
 add_row <- function(x, ...) {
-  if (is.reactive(x)) y <- x()
+  y <- if (is.reactive(x)) x() else x
   y = cbind(y, y[nrow(y)])
   if (is.reactive(x)) x(y)
   y
