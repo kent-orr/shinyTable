@@ -1,6 +1,6 @@
 # shinyTable: Interactive Table Editing in Shiny
 
-shinyTable is an R package that provides an intuitive and simple interface for creating and interacting with tables in Shiny apps. Unlike the popular Shiny extension DT, which focuses on providing DataTables interface, shinyTable streamlines the process of creating editable tables. Its emphasis is on interacting with data in an R-native way, utilizing the familiar syntax of the data.table package for editing a dataframe: x[i,j] <- value.
+shinyTable is an R package that provides an intuitive and simple interface for creating and interacting with tables in Shiny apps. Unlike the popular Shiny extension DT, which focuses on providing DataTables interface, shinyTable streamlines the process of creating editable tables. Its emphasis is on interacting with data in an R-native way, utilizing the familiar syntax of the data.table package for editing a dataframe: x[i,j] <- value. To do so the html generated from a dataframe includes i and j attributes for the input objects, which trigger reactive inputs. So changing the 2nd column on the first row for a table with the id `test` would create an `input$test` with `input$test$i = 1` and `input$test$j = 2`
 
 Here are some key differences between shinyTable and shiny::DT:
 
@@ -10,7 +10,7 @@ shinyTable takes a straightforward approach to creating interactive tables, focu
 
 ## Edit Table Using R-Native Syntax
 
-shinyTable's real strength lies in its use of native R syntax for table manipulation. It leverages the syntax from the data.table package for editing dataframes, i.e., x[i,j] <- value. This makes it easy for R users to grasp and efficiently manipulate their data.
+shinyTable's real strength lies in its use of native R syntax for table manipulation. It leverages the syntax from the data.table package for editing dataframes, i.e., `x[i,j] <- value`. This makes it easy for R users to grasp and efficiently manipulate their data.
 
 ## Specialized Interface for Shiny
 
