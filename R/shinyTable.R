@@ -141,8 +141,13 @@ shinyTable <- function(x,
   
   # Create the table body (tbody)
   tb <- tags$tbody(lapply(1:nrow(x), \(i) {
-    tags$tr(lapply(1:ncol(x), \(j) {
+   
+    
+    
+    tags$tr(
       
+      
+      lapply(1:ncol(x), \(j) {
       # Create plain text columns for id cols
       if (j %in% id_cols) {
         tags$td(x[i][[j]], i = i, j = j, class="shinyTable")
@@ -159,7 +164,8 @@ shinyTable <- function(x,
           
       }
       
-    }), class="shinyTable") # end tr
+    }), class="shinyTable", onclick="trSelect(this)", i = i) # end trs
+    
   }), class="shinyTable") # end tbody
   
   
@@ -170,13 +176,11 @@ shinyTable <- function(x,
   
   # Create the complete table
   tagList(
-    tags$table(tg, th, tb, id = paste("st", table_id, sep = "_"), width="100%")
+    tags$table(tg, th, tb, id = table_id, width="100%")
     , tags$script(js_handle_input_change)
   )
 }
 
-# 
-# y= mtcars[1:2, 1:3]; y$newcol = c(TRUE, FALSE); y$datetime = Sys.time(); y$phone = ""
-# shiny_table(y, table_id = "test", type_list = list(tel = 6)) |> htmltools::html_print()
 
+shinyTable(mtcars[1:2, 1:4]) |> html_print()
 

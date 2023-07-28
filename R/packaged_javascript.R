@@ -50,7 +50,7 @@ r'(function handleInputChange(event) {
       }
       
       if (typeof Shiny !== "undefined") {
-        Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab}, {priority: "event"});
+        Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab, action: "value_change"}, {priority: "event"});
         };
       
       console.log(input.type);
@@ -64,3 +64,5 @@ r'(function handleInputChange(event) {
       input.addEventListener("change", handleInputChange);
     });)'
 )
+
+
