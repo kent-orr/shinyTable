@@ -182,5 +182,5 @@ shinyTable <- function(x,
 }
 
 
-shinyTable(mtcars[1:2, 1:4]) |> html_print()
+# shinyTable(mtcars[1:2, 1:4]) |> html_print()
 
