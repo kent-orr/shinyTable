@@ -19,7 +19,7 @@ shinyTableUI <- function(id
   ns <- NS(id)
   tagList(
     if (add_remove) 
-      tagList(actionButton(ns("add_row"), add_text, icon = icon("plus"))
+      tags$div(actionButton(ns("add_row"), add_text, icon = icon("plus"))
               , actionButton(ns("remove_row"), remove_text, icon = icon("minus")))
     , uiOutput(ns("out"))
     , if (verbose) verbatimTextOutput(ns("console"))
@@ -50,7 +50,7 @@ shinyTableServer <- function(id
     id,
     function(input, output, session) {
       
-      tale_id = paste(id, table_id, sep = "-")
+      # table_id = paste(id, table_id, sep = "-")
       
       init = if(is.reactive(x)) x else reactiveVal(x)
       current = if(is.reactive(x)) x else reactiveVal(x)
@@ -63,7 +63,7 @@ shinyTableServer <- function(id
                    , id_cols = id_cols
                    , skip_cols = skip_cols
                    , type_list = type_list
-                   , id = id
+                   , ns = session$ns
                    , ...)
       })
       
@@ -149,6 +149,7 @@ shinyTableServer <- function(id
         if (is.null(value)) value = NA
         x[i][[j]] <- value
         current(x)
+        init(x)
       })
       
       input_out <- reactiveVal(list())

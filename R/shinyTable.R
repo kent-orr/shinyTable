@@ -105,7 +105,7 @@ shinyTable <- function(x,
                        id_cols = 1,
                        type_list = NULL,
                        skip_cols = NULL,
-                       id = NULL,
+                       ns = NULL,
                        ...) {
   # browser()
   if (shiny::is.reactive(x)) x = x()
@@ -113,8 +113,8 @@ shinyTable <- function(x,
   if (is.null(table_id))
     table_id = deparse(substitute(x))
   
-  if (!is.null(id))
-    table_id = paste(id, table_id, sep = "-")
+  if (!is.null(ns))
+    table_id = ns(table_id)
   
   data.table::setDT(x)
   

@@ -10,7 +10,7 @@ shinyTable(
   id_cols = 1,
   type_list = NULL,
   skip_cols = NULL,
-  id = NULL,
+  ns = NULL,
   ...
 )
 }
@@ -25,9 +25,9 @@ shinyTable(
 
 \item{skip_cols}{a numeric vector of columns to skip}
 
-\item{id}{if used in a shiny module, the module id}
-
 \item{...}{not used yet but don't knock it}
+
+\item{id}{if used in a shiny module, the module id}
 }
 \description{
 Create an editable HTML table
