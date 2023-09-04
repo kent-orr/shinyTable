@@ -1,16 +1,27 @@
 
 
+
 #' UI for an interactive shinyTable module
 #'
 #' @param id module ID
+#' @param add_remove should there be add/remove row buttons
+#' @param verbose print console?
+#' @param add_text button label for add row
+#' @param remove_text button label for remove row
 #'
 #' @export
 #'
-shinyTableUI <- function(id, verbose = interactive()) {
+shinyTableUI <- function(id
+                         , add_remove = TRUE
+                         , verbose = interactive()
+                         , add_text = "Add Row"
+                         , remove_text = "Remove Row") {
   ns <- NS(id)
   tagList(
-    uiOutput(ns("out")  )
-    , actionButton(ns("howdy"), "jey")
+    if (add_remove) 
+      tagList(actionButton(ns("add_row"), add_text, icon = icon("plus"))
+              , actionButton(ns("remove_row"), remove_text, icon = icon("minus")))
+    , uiOutput(ns("out"))
     , if (verbose) verbatimTextOutput(ns("console"))
   )
 }
@@ -34,10 +45,12 @@ shinyTableServer <- function(id
                              , skip_cols = NULL
                              , type_list = NULL
                              , ...
-                             ) {
+) {
   moduleServer(
     id,
     function(input, output, session) {
+      
+      tale_id = paste(id, table_id, sep = "-")
       
       init = if(is.reactive(x)) x else reactiveVal(x)
       current = if(is.reactive(x)) x else reactiveVal(x)
@@ -55,34 +68,103 @@ shinyTableServer <- function(id
       })
       
       output$console <- renderPrint({
-        list(reactiveValuesToList(input)
-             , input[[table_id]]
+        list(init()
+             , current()
         )
       })
       
-      observeEvent(input$howdy, ignoreInit = TRUE, {
-        f()
+      observeEvent(input$add_row, ignoreInit = TRUE, {
+        y = init()[1,]
+        classes = sapply(y, class)
+        classes = sapply(classes, `[`, 1)
+        f = \(x) switch(x, 
+                        numeric = 0
+                        , character = "-"
+                        , logical = FALSE
+                        , POSIXct = as.POSIXct(Sys.time()))
+        y = data.frame(lapply(classes, f))
+        init(rbind(y, init()))
+        current(init())
+        
+        
+        input_out(list(
+          table = table_id
+          , action = "add_row"
+          , i = y
+        ))
+        
+      })
+      
+      observeEvent(input$remove_row, ignoreInit = TRUE, {
+        ch = 1:nrow(current())
+        names(ch) <- lapply(1:nrow(current()), \(i) {
+          x = current()[i,] |> unlist() |> as.character() |> 
+            stringr::str_trunc(9, side = "right") |> 
+            stringr::str_pad(9, side = "left", pad = ".") |>
+            paste(collapse = ", ")
+          
+          paste(paste0("[", i, "]: "), x)
+        })
+        
+        showModal(
+          modalDialog(
+            title = "Remove"
+            , size = "xl"
+            , selectInput(session$ns("remove_choices")
+                          , label = "Rows to Remove"
+                          , choices = ch
+                          , multiple = TRUE
+                          , selectize = FALSE
+                          , size = min(15, nrow(current()))
+                          , width = "100%")
+            , footer = actionButton(session$ns("remove_submit"), "Submit", icon = icon("close"))
+            , easyClose = TRUE
+          )
+        )
+      })
+      
+      observeEvent(input$remove_submit, ignoreInit = TRUE, {
+        if (is.null(input$remove_choices) || length(input$remove_choices) == 0)
+          return()
+        
+        x = current()
+        i = as.numeric(input$remove_choices)
+        x = x[!i,]
+        current(x)
+        init(x)
+        
+        input_out(list(
+          table = table_id
+          , action = "remove_row"
+          , i = i
+        ))
+        
+        removeModal()
       })
       
       observeEvent(input[[table_id]], ignoreNULL = TRUE, {
         x = current()
         l = input[[table_id]]
         i = l$i; j = l$j; value = l$value
-        # browser()
         if (is.null(value)) value = NA
         x[i][[j]] <- value
         current(x)
-        
-        
+      })
+      
+      input_out <- reactiveVal(list())
+      
+      observeEvent(input[[table_id]], ignoreNULL = TRUE, {
+        x = input[[table_id]]
+        if (is.null(x)) return("nothing")
+        x$table = gsub(paste0(id, "-"), "", x$table)
+        input_out(x)
       })
       
       return_out <- reactive({
         if (mode == "inputs") {
-          x = input[[table_id]]
-          x[[table]] = gsub(paste0(id, "-"), "", x[[table]])
-          x
+          input_out()
         } else if (mode == "data.frame") {
-          current
+          current()
         }
       })
       
@@ -104,7 +186,7 @@ run_test <- function(mode = "data.frame") {
   )
   
   server <- function(input, output, session) {
-    y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = Sys.time()
+    y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
     x = shinyTableServer("a", y, mode = mode,  table_id = "test_table", id_cols = 1)
     output$main_console <- renderPrint(x())
   }
@@ -112,5 +194,4 @@ run_test <- function(mode = "data.frame") {
   shiny::shinyApp(ui, server)
 }
 
-
-
+# run_test(mode = "inputs")

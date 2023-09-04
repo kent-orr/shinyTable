@@ -3,7 +3,6 @@
 export(add_row)
 export(generate_tags_input)
 export(get_column_input_type)
-export(js_handle_input_change)
 export(remove_row)
 export(run_test)
 export(shinyTable)

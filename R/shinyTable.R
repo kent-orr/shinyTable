@@ -177,7 +177,7 @@ shinyTable <- function(x,
   # Create the complete table
   tagList(
     tags$table(tg, th, tb, id = table_id, width="100%")
-    , tags$script(js_handle_input_change)
+    , tags$script(inputChange)
   )
 }
 
