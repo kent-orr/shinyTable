@@ -9,7 +9,9 @@ shinyTableServer(
   x,
   mode = "inputs",
   table_id = NULL,
-  id_cols = 1,
+  id_cols = NULL,
+  sort_cols = id_cols,
+  uid_cols = NULL,
   skip_cols = NULL,
   type_list = NULL,
   ...

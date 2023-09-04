@@ -8,6 +8,7 @@ shinyTableUI(
   id,
   add_remove = TRUE,
   verbose = interactive(),
+  sort = TRUE,
   add_text = "Add Row",
   remove_text = "Remove Row"
 )
