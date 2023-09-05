@@ -57,3 +57,99 @@ shinyTable provides a built-in module specifically designed to seamlessly integr
 
 shinyTable is designed with Shiny's reactive programming model in mind. Its interface has reactive inputs and outputs, making it highly compatible with reactive functions in Shiny. The interactivity and reactivity are handled in a more R-centric way compared to DT, which handles these features via DataTables JavaScript library.
 
+<table id="mtcars[1:2, 1:4]" width="100%">
+  <colgroup>
+    <col j="1"/>
+    <col j="2"/>
+    <col j="3"/>
+    <col j="4"/>
+  </colgroup>
+  <thead>
+    <th i="0" j="1">Mile Per Gallon</th>
+    <th i="0" j="2">cyl</th>
+    <th i="0" j="3">disp</th>
+    <th i="0" j="4">hp</th>
+  </thead>
+  <tbody class="shinyTable">
+    <tr class="shinyTable" onclick="trSelect(this)" i="1">
+      <td i="1" j="1" class="shinyTable">21</td>
+      <td i="1" j="2" class="shinyTable">
+        <input type="number" step="0.01" value="6" i="1" j="2" class="shinyTable-input" table="mtcars[1:2, 1:4]" size="4" style="transition: size 5s;position: relative;border:none;"/>
+      </td>
+      <td i="1" j="3" class="shinyTable">
+        <input type="number" step="0.01" value="160" i="1" j="3" class="shinyTable-input" table="mtcars[1:2, 1:4]" size="6" style="transition: size 5s;position: relative;border:none;"/>
+      </td>
+      <td i="1" j="4" class="shinyTable">
+        <input type="number" step="0.01" value="110" i="1" j="4" class="shinyTable-input" table="mtcars[1:2, 1:4]" size="6" style="transition: size 5s;position: relative;border:none;"/>
+      </td>
+    </tr>
+    <tr class="shinyTable" onclick="trSelect(this)" i="2">
+      <td i="2" j="1" class="shinyTable">21</td>
+      <td i="2" j="2" class="shinyTable">
+        <input type="number" step="0.01" value="6" i="2" j="2" class="shinyTable-input" table="mtcars[1:2, 1:4]" size="4" style="transition: size 5s;position: relative;border:none;"/>
+      </td>
+      <td i="2" j="3" class="shinyTable">
+        <input type="number" step="0.01" value="160" i="2" j="3" class="shinyTable-input" table="mtcars[1:2, 1:4]" size="6" style="transition: size 5s;position: relative;border:none;"/>
+      </td>
+      <td i="2" j="4" class="shinyTable">
+        <input type="number" step="0.01" value="110" i="2" j="4" class="shinyTable-input" table="mtcars[1:2, 1:4]" size="6" style="transition: size 5s;position: relative;border:none;"/>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<script>function handleInputChange(event) {
+      const input = event.target;
+      const i = parseInt(input.getAttribute("i"));
+      const j = parseInt(input.getAttribute("j"));
+      const tab = input.getAttribute("table");
+      
+      var validity_exemptions = ["datetime-local", "date"];
+      
+      if (!validity_exemptions.includes(input.type)) {
+       if (!input.checkValidity()) {
+          input.value = null;
+          return 0;
+       }
+      }
+      
+      switch(input.type) {
+        case "checkbox":
+        console.log(input.checked);
+        var value = input.checked;
+        break;
+        
+        case "radio":
+        console.log(input.checked);
+        var value = input.checked;
+        break;
+        
+        case "date":
+        var value = Math.round(input.valueAsNumber / (1000 * 60 * 60 * 24));
+        if (value === "") value = NaN
+        break;
+        
+        case "datetime-local":
+        var value = Math.round(input.valueAsNumber / 1000);
+        if (value === "") value = NaN
+        break;
+        
+        default: 
+        var value = input.value;
+        var col_inputs = document.querySelectorAll("#st_" + tab + " input[j='" + j + "']");
+        col_array = [];
+        col_inputs.forEach(x => col_array.push(x.value.length));
+        col_inputs.forEach(x => x.size = 3 + Math.max.apply(Math, col_array));
+      }
+      
+      if (typeof Shiny !== "undefined") {
+        Shiny.setInputValue(tab, {i: i, j: j, value: value, table: tab, action: "value_change"}, {priority: "event"});
+        };
+      
+      console.log({i: i, j: j, value: value, table: tab, action: "value_change"})
+      
+    }
+    
+    // Attach event listener to all input elements with the class "shinyTable-input"
+    document.querySelectorAll(".shinyTable-input").forEach(input => {
+      input.addEventListener("change", handleInputChange);
+    });</script>
