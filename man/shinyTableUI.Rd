@@ -7,23 +7,44 @@
 shinyTableUI(
   id,
   add_remove = TRUE,
-  verbose = interactive(),
   sort = TRUE,
   add_text = "Add Row",
-  remove_text = "Remove Row"
+  remove_text = "Remove Row",
+  verbose = interactive()
 )
 }
 \arguments{
-\item{id}{module ID}
+\item{id}{The module ID.}
 
-\item{add_remove}{should there be add/remove row buttons}
+\item{add_remove}{Should there be add/remove row buttons.}
 
-\item{verbose}{print console?}
+\item{sort}{Whether to include a sorting option for the table.}
 
-\item{add_text}{button label for add row}
+\item{add_text}{The label for the "Add Row" button.}
 
-\item{remove_text}{button label for remove row}
+\item{remove_text}{The label for the "Remove Row" button.}
+
+\item{verbose}{Whether to print console output.}
 }
 \description{
-UI for an interactive shinyTable module
+This function generates the user interface (UI) for an interactive shinyTable module within a Shiny application. It provides options to add and remove rows from the table, and can also display a sorting option.
+}
+\examples{
+# Create the UI for a shinyTable module
+shinyTableUI("table_module", add_remove = TRUE, sort = TRUE)
+
+# Use the module in the UI
+ui <- fluidPage(
+  shinyTableUI("table_module", add_remove = TRUE, sort = TRUE),
+  # Other UI elements...
+)
+
+# Define server logic for the UI
+server <- function(input, output, session) {
+  shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
+  # Other server logic...
+}
+
+shinyApp(ui, server)
+
 }

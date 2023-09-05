@@ -19,12 +19,48 @@ shinyTableServer(
 )
 }
 \arguments{
-\item{id}{module ID}
+\item{id}{The module ID.}
 
-\item{x}{a dataframe or reactive dataframe}
+\item{x}{A data frame or reactive data frame containing the data for the table.}
 
-\item{mode}{either "data.frame" or "inputs"}
+\item{mode}{The mode for the table, either "data.frame" or "inputs".}
+
+\item{table_id}{An optional ID for the table. If not provided, a default ID will be used.}
+
+\item{id_cols}{A numeric vector of column indices to be displayed as static text.}
+
+\item{sort_cols}{A numeric vector of column indices to use for sorting the table.}
+
+\item{col_names}{A character vector specifying custom column names for the table headers.}
+
+\item{uid_cols}{A numeric vector of column indices to be used as unique identifiers for each row.}
+
+\item{skip_cols}{A numeric vector of column indices to skip during table generation.}
+
+\item{type_list}{A list specifying input types for specific columns.}
+
+\item{...}{Additional arguments (currently not used).}
+}
+\value{
+The module server function that defines the behavior of the shinyTable instance.
 }
 \description{
-Server logic for a shinyTable instance
+This module provides the server logic for a shinyTable instance, which allows you to create and manage an editable HTML table within a Shiny application.
+}
+\examples{
+
+# Use the module in the UI
+ui <- fluidPage(
+  shinyTableUI("table_module"),
+  # Other UI elements...
+)
+
+# Define server logic for the UI
+server <- function(input, output, session) {
+  shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
+  # Other server logic...
+}
+
+shinyApp(ui, server)
+
 }
