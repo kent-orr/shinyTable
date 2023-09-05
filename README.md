@@ -2,6 +2,34 @@
 
 shinyTable is an R package that provides an intuitive and simple interface for creating and interacting with tables in Shiny apps. Unlike the popular Shiny extension DT, which focuses on providing a DataTables interface, shinyTable streamlines the process of creating editable tables. Its emphasis is on interacting with data in an R-native way, utilizing the familiar syntax of the base R / `data.table` package for editing a dataframe: `x[i,j] <- value`. To do so the html generated from a dataframe includes i and j attributes for the input objects, which trigger reactive inputs. So changing the 2nd column on the first row for a table with the id `test` would create an `input$test` with `input$test$i = 1` and `input$test$j = 2`
 
+## Getting Started
+
+**Installation:** Install from github with:
+```{r}
+remotes::install_github(kent-orr/shinyTable)
+# for dev branch remotes::install_github(kent-orr/shinyTable, ref = 'dev')
+```
+
+## Module Integration
+
+shinyTable comes with a server and UI module pair for drop-in use in a shiny application.
+
+```{r}
+ui <- fluidPage(
+  shinyTableUI("a", verbose = FALSE, sort = FALSE)
+  , verbatimTextOutput("main_console")
+)
+
+server <- function(input, output, session) {
+  # y = mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
+  x = shinyTableServer("a", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "both", table_id = "test_table", id_cols = 1)
+  output$main_console <- renderPrint(x())
+}
+
+shiny::shinyApp(ui, server)
+```
+
+
 Here are some key differences between `shinyTable` and `DT`:
 
 ## Simplicity of Interactive Tables
