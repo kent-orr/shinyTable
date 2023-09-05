@@ -56,7 +56,7 @@ shinyTableUI <- function(id
 #'
 #' @param id The module ID.
 #' @param x A data frame or reactive data frame containing the data for the table.
-#' @param mode The mode for the table, either "data.frame" or "inputs".
+#' @param mode The mode for the table, either "data.frame", "inputs", or "both".
 #' @param table_id An optional ID for the table. If not provided, a default ID will be used.
 #' @param id_cols A numeric vector of column indices to be displayed as static text.
 #' @param sort_cols A numeric vector of column indices to use for sorting the table.
