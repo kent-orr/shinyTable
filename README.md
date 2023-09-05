@@ -12,6 +12,8 @@ remotes::install_github(kent-orr/shinyTable)
 
 ## Module Integration
 
+shinyTable comes with a server and UI module pair for drop-in use in a shiny application.
+
 ```{r}
 ui <- fluidPage(
   shinyTableUI("a", verbose = FALSE, sort = FALSE)
