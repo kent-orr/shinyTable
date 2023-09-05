@@ -46,6 +46,7 @@ shinyTableServer <- function(id
                              , table_id = NULL
                              , id_cols = NULL
                              , sort_cols = id_cols
+                             , col_names = NULL
                              , uid_cols = NULL
                              , skip_cols = NULL
                              , type_list = NULL
@@ -69,6 +70,7 @@ shinyTableServer <- function(id
                    , uid_cols = uid_cols
                    , sort_cols = id_cols
                    , skip_cols = skip_cols
+                   , col_names = col_names
                    , type_list = type_list
                    , ns = session$ns
                    , ...)
@@ -83,14 +85,24 @@ shinyTableServer <- function(id
       output$sort <- renderUI({
         nm = names(init())
         vals = seq_along(nm)
-        nm = nm[!nm %in% skip_cols]
+        if(length(skip_cols) > 0) {
+          nm <- nm[-skip_cols]
+          vals <- vals[-skip_cols]
+        } else {nm}
+        for (i in seq_along(nm)) {
+          j = which(names(col_names) == nm[i])
+          if (length(j) > 0)
+            nm[i] <- unlist(col_names[j])
+        }
+        
         ch = vals; names(ch) = nm
-        selectInput(session$ns("sort"), "Sort Table", choices = ch, selected = ch[1], multiple= TRUE, selectize = TRUE)
+        selectInput(session$ns("sort"), "Sort Table", choices = ch, selected = ch[1], multiple = TRUE, selectize = TRUE)
       })
       
       observeEvent(input$sort, ignoreNULL = TRUE, {
         # browser()
         sort_cols = input$sort
+        if(any(is.na(sort_cols))) return()
         x = sapply(sort_cols, \(x) if(x<0) "desc" else "asc")
         x = as.list(x)
         names(x) <- sort_cols
@@ -152,12 +164,12 @@ shinyTableServer <- function(id
             , size = "xl"
             , tags$div(style='font-family:monospace;',
                        selectInput(session$ns("remove_choices")
-                          , label = "Rows to Remove"
-                          , choices = ch
-                          , multiple = TRUE
-                          , selectize = FALSE
-                          , size = min(15, nrow(current()))
-                          , width = "100%")
+                                   , label = "Rows to Remove"
+                                   , choices = ch
+                                   , multiple = TRUE
+                                   , selectize = FALSE
+                                   , size = min(15, nrow(current()))
+                                   , width = "100%")
             )
             , footer = actionButton(session$ns("remove_submit"), "Submit", icon = icon("close"))
             , easyClose = TRUE
@@ -236,7 +248,7 @@ run_test <- function(mode = "data.frame") {
   
   server <- function(input, output, session) {
     y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
-    x = shinyTableServer("a", y, mode = mode, table_id = "test_table", id_cols = 1)
+    x = shinyTableServer("a", y, mode = mode, table_id = "test_table", col_names = list("mpg" = "Miles per Gallon"), id_cols = 1)
     output$main_console <- renderPrint(x())
   }
   

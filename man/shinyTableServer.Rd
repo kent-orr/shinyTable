@@ -11,6 +11,7 @@ shinyTableServer(
   table_id = NULL,
   id_cols = NULL,
   sort_cols = id_cols,
+  col_names = NULL,
   uid_cols = NULL,
   skip_cols = NULL,
   type_list = NULL,

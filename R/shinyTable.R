@@ -80,10 +80,11 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              } else {
                NULL
              } # end placeholder
+             , step = if(type == "number") .01 else NULL
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
-             style='transition: size 5s;position: relative;')
+             style='transition: size 5s;position: relative;border:none;')
 }
 
 #' Create an editable HTML table
@@ -104,6 +105,7 @@ shinyTable <- function(x,
                        table_id = NULL,
                        id_cols = 1,
                        type_list = NULL,
+                       col_names = NULL,
                        skip_cols = NULL,
                        ns = NULL,
                        ...) {
@@ -119,12 +121,22 @@ shinyTable <- function(x,
   data.table::setDT(x)
   
   # Create the table headers (thead)
+  # browser()
+  
+  nms = if(!is.null(col_names)) {
+    names(col_names)
+  } else {
+    names(x)
+  }
+    
   th <- names(x) |> lapply(\(nm) {
     j = which(nm == names(x))
     if (j %in% skip_cols) {
       NULL
     } else {
-      tags$th(nm, i = 0, j = j)
+      # browser()
+      i = which(nms == nm)
+      tags$th(if(is.null(col_names) || length(i) == 0) nm else col_names[i], i = 0, j = j)
     }
     }) |> tags$thead()
   
@@ -142,11 +154,8 @@ shinyTable <- function(x,
   # Create the table body (tbody)
   tb <- tags$tbody(lapply(1:nrow(x), \(i) {
    
-    
-    
     tags$tr(
-      
-      
+   
       lapply(1:ncol(x), \(j) {
       # Create plain text columns for id cols
       if (j %in% id_cols) {
@@ -166,7 +175,8 @@ shinyTable <- function(x,
       
     }), class="shinyTable", onclick="trSelect(this)", i = i) # end trs
     
-  }), class="shinyTable") # end tbody
+  }), class="shinyTable"
+  ) # end tbody
   
   
   # Create colgroups
@@ -182,5 +192,5 @@ shinyTable <- function(x,
 }
 
 
-# shinyTable(mtcars[1:2, 1:4]) |> html_print()
+# shinyTable(mtcars[1:2, 1:4], col_names = list("mpg" = "Mile Per Gallon")) |> html_print()
 

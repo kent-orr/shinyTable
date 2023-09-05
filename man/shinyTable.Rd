@@ -9,6 +9,7 @@ shinyTable(
   table_id = NULL,
   id_cols = 1,
   type_list = NULL,
+  col_names = NULL,
   skip_cols = NULL,
   ns = NULL,
   ...
