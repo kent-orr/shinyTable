@@ -34,10 +34,10 @@
 #'
 shinyTableUI <- function(id
                          , add_remove = TRUE
-                         , verbose = interactive()
                          , sort = TRUE
                          , add_text = "Add Row"
-                         , remove_text = "Remove Row") {
+                         , remove_text = "Remove Row"
+                         , verbose = interactive()) {
   ns <- NS(id)
   tagList(
     tags$script(js_helpers)
