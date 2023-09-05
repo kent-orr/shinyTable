@@ -3,13 +3,34 @@
 
 #' UI for an interactive shinyTable module
 #'
-#' @param id module ID
-#' @param add_remove should there be add/remove row buttons
-#' @param verbose print console?
-#' @param add_text button label for add row
-#' @param remove_text button label for remove row
+#' This function generates the user interface (UI) for an interactive shinyTable module within a Shiny application. It provides options to add and remove rows from the table, and can also display a sorting option.
+#'
+#' @param id The module ID.
+#' @param add_remove Should there be add/remove row buttons.
+#' @param verbose Whether to print console output.
+#' @param sort Whether to include a sorting option for the table.
+#' @param add_text The label for the "Add Row" button.
+#' @param remove_text The label for the "Remove Row" button.
 #'
 #' @export
+#'
+#' @examples
+#' # Create the UI for a shinyTable module
+#' shinyTableUI("table_module", add_remove = TRUE, sort = TRUE)
+#'
+#' # Use the module in the UI
+#' ui <- fluidPage(
+#'   shinyTableUI("table_module", add_remove = TRUE, sort = TRUE),
+#'   # Other UI elements...
+#' )
+#'
+#' # Define server logic for the UI
+#' server <- function(input, output, session) {
+#'   shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
+#'   # Other server logic...
+#' }
+#'
+#' shinyApp(ui, server)
 #'
 shinyTableUI <- function(id
                          , add_remove = TRUE
@@ -31,15 +52,40 @@ shinyTableUI <- function(id
 
 #' Server logic for a shinyTable instance
 #'
-#' @param id module ID
-#' @param x a dataframe or reactive dataframe
-#' @param mode either "data.frame" or "inputs"
-#' @inheritParams shiny_table
+#' This module provides the server logic for a shinyTable instance, which allows you to create and manage an editable HTML table within a Shiny application.
 #'
-#' @return 
+#' @param id The module ID.
+#' @param x A data frame or reactive data frame containing the data for the table.
+#' @param mode The mode for the table, either "data.frame" or "inputs".
+#' @param table_id An optional ID for the table. If not provided, a default ID will be used.
+#' @param id_cols A numeric vector of column indices to be displayed as static text.
+#' @param sort_cols A numeric vector of column indices to use for sorting the table.
+#' @param col_names A character vector specifying custom column names for the table headers.
+#' @param uid_cols A numeric vector of column indices to be used as unique identifiers for each row.
+#' @param skip_cols A numeric vector of column indices to skip during table generation.
+#' @param type_list A list specifying input types for specific columns.
+#' @param ... Additional arguments (currently not used).
+#'
+#' @return The module server function that defines the behavior of the shinyTable instance.
+#'
 #' @export
 #'
 #' @examples
+#'
+#' # Use the module in the UI
+#' ui <- fluidPage(
+#'   shinyTableUI("table_module"),
+#'   # Other UI elements...
+#' )
+#'
+#' # Define server logic for the UI
+#' server <- function(input, output, session) {
+#'   shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
+#'   # Other server logic...
+#' }
+#'
+#' shinyApp(ui, server)
+#'
 shinyTableServer <- function(id
                              , x
                              , mode = "inputs"
@@ -55,8 +101,6 @@ shinyTableServer <- function(id
   moduleServer(
     id,
     function(input, output, session) {
-      
-      # table_id = paste(id, table_id, sep = "-")
       
       init = if(is.reactive(x)) x else reactiveVal(x)
       current = if(is.reactive(x)) x else reactiveVal(x)
@@ -184,7 +228,6 @@ shinyTableServer <- function(id
         x = current()
         i = as.numeric(input$remove_choices)
         x = x[!i,]
-        
         
         input_out(list(
           table = table_id

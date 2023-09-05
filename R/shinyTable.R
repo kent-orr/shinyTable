@@ -89,18 +89,31 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 
 #' Create an editable HTML table
 #'
-#' @param x a data.frame or reactive object
-#' @param table_id the id of the table, defaults to x
-#' @param id_cols a numeric vector of columns that are displayed as static text
-#' @param type_list list of column input types of the format `list(text = 2, checkbox = c(3, 5))`. Columns are guessed by `shinyTable:::get_column_input_type`. Arguments override guesses
-#' @param skip_cols a numeric vector of columns to skip
-#' @param id if used in a shiny module, the module id
-#' @param ... not used yet but don't knock it
+#' This function generates an editable HTML table based on the provided data. It can be used in Shiny applications to display and interact with tabular data.
 #'
-#' @return
+#' @param x A data.frame or reactive object containing the data to be displayed in the table.
+#' @param table_id An optional ID for the table. If not provided, the ID will default to the name of the input data.
+#' @param id_cols A numeric vector of column indices that should be displayed as static text.
+#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses.
+#' @param col_names A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.
+#' @param skip_cols A numeric vector of column indices to skip during table generation.
+#' @param ns The namespace of the Shiny module if used within a module context.
+#' @param ... Additional arguments (currently not used).
+#'
+#' @return An HTML table with interactive input cells and static text cells based on the provided data and parameters.
+#'
 #' @export
 #'
 #' @examples
+#' # Generate a simple editable table with default settings
+#' shinyTable(data.frame(A = 1:5, B = 6:10))
+#'
+#' # Generate a table with custom column names and input types
+#' shinyTable(data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), col_names = c("Person", "Years"), type_list = list(text = 1, numeric = 2))
+#'
+#' # Generate a table with specified static text columns and skipped columns
+#' shinyTable(data.frame(ID = 1:3, Name = c("Alice", "Bob", "Carol"), Value = c(10, 20, 30)), id_cols = 1, skip_cols = 3)
+#'
 shinyTable <- function(x,
                        table_id = NULL,
                        id_cols = 1,
