@@ -2,9 +2,11 @@
 
 export(generate_tags_input)
 export(get_column_input_type)
-export(js_handle_input_change)
 export(run_test)
-export(shiny_table)
+export(shinyTable)
+export(shinyTableServer)
+export(shinyTableUI)
+export(uid)
 importFrom(data.table,":=")
 importFrom(data.table,.BY)
 importFrom(data.table,.EACHI)

@@ -80,32 +80,47 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              } else {
                NULL
              } # end placeholder
+             , step = if(type == "number") .01 else NULL
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
-             style='transition: size 5s;position: relative;')
+             style='transition: size 5s;position: relative;border:none;')
 }
 
 #' Create an editable HTML table
 #'
-#' @param x a data.frame or reactive object
-#' @param table_id the id of the table, defaults to x
-#' @param id_cols a numeric vector of columns that are displayed as static text
-#' @param type_list list of column input types of the format `list(text = 2, checkbox = c(3, 5))`. Columns are guessed by `shinyTable:::get_column_input_type`. Arguments override guesses
-#' @param skip_cols a numeric vector of columns to skip
-#' @param id if used in a shiny module, the module id
-#' @param ... not used yet but don't knock it
+#' This function generates an editable HTML table based on the provided data. It can be used in Shiny applications to display and interact with tabular data.
 #'
-#' @return
+#' @param x A data.frame or reactive object containing the data to be displayed in the table.
+#' @param table_id An optional ID for the table. If not provided, the ID will default to the name of the input data.
+#' @param id_cols A numeric vector of column indices that should be displayed as static text.
+#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses.
+#' @param col_names A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.
+#' @param skip_cols A numeric vector of column indices to skip during table generation.
+#' @param ns The namespace of the Shiny module if used within a module context.
+#' @param ... Additional arguments (currently not used).
+#'
+#' @return An HTML table with interactive input cells and static text cells based on the provided data and parameters.
+#'
 #' @export
 #'
 #' @examples
-shiny_table <- function(x,
+#' # Generate a simple editable table with default settings
+#' shinyTable(data.frame(A = 1:5, B = 6:10))
+#'
+#' # Generate a table with custom column names and input types
+#' shinyTable(data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), col_names = c("Person", "Years"), type_list = list(text = 1, numeric = 2))
+#'
+#' # Generate a table with specified static text columns and skipped columns
+#' shinyTable(data.frame(ID = 1:3, Name = c("Alice", "Bob", "Carol"), Value = c(10, 20, 30)), id_cols = 1, skip_cols = 3)
+#'
+shinyTable <- function(x,
                        table_id = NULL,
                        id_cols = 1,
                        type_list = NULL,
+                       col_names = NULL,
                        skip_cols = NULL,
-                       id = NULL,
+                       ns = NULL,
                        ...) {
   # browser()
   if (shiny::is.reactive(x)) x = x()
@@ -113,18 +128,28 @@ shiny_table <- function(x,
   if (is.null(table_id))
     table_id = deparse(substitute(x))
   
-  if (!is.null(id))
-    table_id = paste(id, table_id, sep = "-")
+  if (!is.null(ns))
+    table_id = ns(table_id)
   
   data.table::setDT(x)
   
   # Create the table headers (thead)
+  # browser()
+  
+  nms = if(!is.null(col_names)) {
+    names(col_names)
+  } else {
+    names(x)
+  }
+    
   th <- names(x) |> lapply(\(nm) {
     j = which(nm == names(x))
     if (j %in% skip_cols) {
       NULL
     } else {
-      tags$th(nm, i = 0, j = j)
+      # browser()
+      i = which(nms == nm)
+      tags$th(if(is.null(col_names) || length(i) == 0) nm else col_names[i], i = 0, j = j)
     }
     }) |> tags$thead()
   
@@ -141,8 +166,10 @@ shiny_table <- function(x,
   
   # Create the table body (tbody)
   tb <- tags$tbody(lapply(1:nrow(x), \(i) {
-    tags$tr(lapply(1:ncol(x), \(j) {
-      
+   
+    tags$tr(
+   
+      lapply(1:ncol(x), \(j) {
       # Create plain text columns for id cols
       if (j %in% id_cols) {
         tags$td(x[i][[j]], i = i, j = j, class="shinyTable")
@@ -159,8 +186,10 @@ shiny_table <- function(x,
           
       }
       
-    }), class="shinyTable") # end tr
-  }), class="shinyTable") # end tbody
+    }), class="shinyTable", onclick="trSelect(this)", i = i) # end trs
+    
+  }), class="shinyTable"
+  ) # end tbody
   
   
   # Create colgroups
@@ -170,13 +199,11 @@ shiny_table <- function(x,
   
   # Create the complete table
   tagList(
-    tags$table(tg, th, tb, id = paste("st", table_id, sep = "_"), width="100%")
-    , tags$script(js_handle_input_change)
+    tags$table(tg, th, tb, id = table_id, width="100%")
+    , tags$script(inputChange)
   )
 }
 
-# 
-# y= mtcars[1:2, 1:3]; y$newcol = c(TRUE, FALSE); y$datetime = Sys.time(); y$phone = ""
-# shiny_table(y, table_id = "test", type_list = list(tel = 6)) |> htmltools::html_print()
 
+# shinyTable(mtcars[1:2, 1:4], col_names = list("mpg" = "Mile Per Gallon")) |> html_print()
 
