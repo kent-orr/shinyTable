@@ -122,7 +122,7 @@ shinyTable <- function(x,
                        skip_cols = NULL,
                        ns = NULL,
                        ...) {
-  # browser()
+  
   if (shiny::is.reactive(x)) x = x()
   
   if (is.null(table_id))
@@ -151,7 +151,7 @@ shinyTable <- function(x,
       i = which(nms == nm)
       tags$th(if(is.null(col_names) || length(i) == 0) nm else col_names[i], i = 0, j = j)
     }
-    }) |> tags$thead()
+    }) |> tags$thead(class="shinyTable")
   
   # Guess column input types
   col_types = lapply(x, \(y) get_column_input_type(class(y)))
@@ -176,7 +176,7 @@ shinyTable <- function(x,
       } 
       # Skip columns specified in skip_cols
       else if (j %in% skip_cols) {
-        # tags$td(style = "width:0px;")
+        return()
       } 
       # Create input cells for other columns
       else {
@@ -204,6 +204,4 @@ shinyTable <- function(x,
   )
 }
 
-
-# shinyTable(mtcars[1:2, 1:4], col_names = list("mpg" = "Mile Per Gallon")) |> html_print()
 

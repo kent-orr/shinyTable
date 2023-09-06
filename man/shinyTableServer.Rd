@@ -23,7 +23,7 @@ shinyTableServer(
 
 \item{x}{A data frame or reactive data frame containing the data for the table.}
 
-\item{mode}{The mode for the table, either "data.frame" or "inputs".}
+\item{mode}{The mode for the table, either "data.frame", "inputs", or "both".}
 
 \item{table_id}{An optional ID for the table. If not provided, a default ID will be used.}
 
