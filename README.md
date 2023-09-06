@@ -6,8 +6,8 @@ shinyTable is an R package that provides an intuitive and simple interface for c
 
 **Installation:** Install from github with:
 ```{r}
-remotes::install_github(kent-orr/shinyTable)
-# for dev branch remotes::install_github(kent-orr/shinyTable, ref = 'dev')
+remotes::install_github('kent-orr/shinyTable')
+# for dev branch remotes::install_github('kent-orr/shinyTable', ref = 'dev')
 ```
 
 ## Module Integration
