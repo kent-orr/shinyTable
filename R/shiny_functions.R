@@ -106,7 +106,7 @@ shinyTableServer <- function(id
       current = if(is.reactive(x)) x else reactiveVal(x)
       
       output$out <- renderUI({
-        
+        req(init)
         shinyTable(x = init
                    , mode = mode
                    , table_id = table_id

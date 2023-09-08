@@ -84,7 +84,7 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
-             style='transition: size 5s;position: relative;border:none;')
+             style='transition:5s; position:relative; border:none; width:"100%"')
 }
 
 #' Create an editable HTML table
@@ -125,6 +125,9 @@ shinyTable <- function(x,
   
   if (shiny::is.reactive(x)) x = x()
   
+  if (is.null(x) || nrow(x) == 0)
+    return(tagLIst(tags$p("No Table Data")))
+  
   if (is.null(table_id))
     table_id = deparse(substitute(x))
   
@@ -134,7 +137,6 @@ shinyTable <- function(x,
   data.table::setDT(x)
   
   # Create the table headers (thead)
-  # browser()
   
   nms = if(!is.null(col_names)) {
     names(col_names)
