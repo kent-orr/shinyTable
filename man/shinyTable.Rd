@@ -11,6 +11,7 @@ shinyTable(
   type_list = NULL,
   col_names = NULL,
   skip_cols = NULL,
+  searchable = TRUE,
   ns = NULL,
   ...
 )

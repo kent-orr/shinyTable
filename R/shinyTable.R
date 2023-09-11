@@ -120,6 +120,7 @@ shinyTable <- function(x,
                        type_list = NULL,
                        col_names = NULL,
                        skip_cols = NULL,
+                       searchable = TRUE,
                        ns = NULL,
                        ...) {
   
@@ -201,8 +202,10 @@ shinyTable <- function(x,
   
   # Create the complete table
   tagList(
-    tags$table(tg, th, tb, id = table_id, width="100%")
+    if(searchable) tags$input(type="text", class = "shinyTable-search", id = paste0(table_id, "-search"), onkeyup="searchTable(this)")
+    , tags$table(tg, th, tb, id = table_id, width="100%")
     , tags$script(inputChange)
+    , tags$script(searchTable)
   )
 }
 

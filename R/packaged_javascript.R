@@ -5,3 +5,11 @@
 #' js helpers
 #' 
 "js_helpers"
+
+#' searchTable
+#' 
+"searchTable"
+
+#' sortTable
+#' 
+"sortTable"
