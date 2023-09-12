@@ -11,6 +11,7 @@ shinyTable(
   type_list = NULL,
   col_names = NULL,
   skip_cols = NULL,
+  sortable = "asc",
   searchable = TRUE,
   ns = NULL,
   ...
@@ -28,6 +29,10 @@ shinyTable(
 \item{col_names}{A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.}
 
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
+
+\item{sortable}{either "asc" or "desc" or NULL, giving sort order or no sort at all}
+
+\item{searchable}{A boolean to indicate if a search box should be implemented.}
 
 \item{ns}{The namespace of the Shiny module if used within a module context.}
 
