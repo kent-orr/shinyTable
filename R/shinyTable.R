@@ -97,6 +97,8 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 #' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses.
 #' @param col_names A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.
 #' @param skip_cols A numeric vector of column indices to skip during table generation.
+#' @param add_remove Either NULL or a character vector of the input labels for add row  remove row buttons
+#' @param searchable A boolean to indicate if a search box should be implemented.
 #' @param ns The namespace of the Shiny module if used within a module context.
 #' @param ... Additional arguments (currently not used).
 #'
@@ -120,6 +122,8 @@ shinyTable <- function(x,
                        type_list = NULL,
                        col_names = NULL,
                        skip_cols = NULL,
+                       add_remove = c("Add Row", "Remove Row"),
+                       sortable = "asc",
                        searchable = TRUE,
                        ns = NULL,
                        ...) {
@@ -194,7 +198,6 @@ shinyTable <- function(x,
   }), class="shinyTable"
   ) # end tbody
   
-  
   # Create colgroups
   tg = tags$colgroup(lapply(setdiff(1:ncol(x), skip_cols), \(j) {
     tags$col(j=j)
@@ -202,11 +205,32 @@ shinyTable <- function(x,
   
   # Create the complete table
   tagList(
-    if(searchable) tags$input(type="text", class = "shinyTable-search", id = paste0(table_id, "-search"), onkeyup="searchTable(this)")
+    if(sortable %in% c("asc", "desc")) {
+      tagList(
+        
+        tags$label(`for`=paste0(table_id, "-sort"), "Sort By")
+        , tags$select(name=paste0(table_id, "-sort")
+                      , onchange=paste0("(function(x){sort_table('", table_id, "', {[x.value]: 'asc'})})(event.target)")
+                      , lapply(names(x), \(nm) {
+                        # browser()
+                        j = which(nm == names(x))
+                        if (j %in% skip_cols) {
+                          NULL
+                        } else {
+                          i = which(nms == nm)
+                          tags$option(if(is.null(col_names) || length(i) == 0) nm else col_names[i], value = j)
+                        }
+                      })
+        )
+      )
+    }
+    , if(searchable) tags$input(type="text", class = "shinyTable-search", id = paste0(table_id, "-search"), onkeyup="searchTable(this)")
     , tags$table(tg, th, tb, id = table_id, width="100%")
     , tags$script(inputChange)
     , tags$script(searchTable)
+    , tags$script(sortTable)
   )
 }
 
 
+shinyTable(x, col_names = c("mpg" = "MPG")) |> htmltools::html_print()
