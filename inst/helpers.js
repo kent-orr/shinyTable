@@ -21,3 +21,4 @@ const inputs = document.querySelectorAll(".shinyTable-input");
 inputs.forEach(input => {
   input.addEventListener("change", handleInputChange);
 });
+

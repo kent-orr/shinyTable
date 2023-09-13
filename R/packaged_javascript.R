@@ -13,3 +13,7 @@
 #' sortTable
 #' 
 "sortTable"
+
+#' hideRows
+#' 
+"hideRows"

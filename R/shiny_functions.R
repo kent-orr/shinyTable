@@ -112,7 +112,6 @@ shinyTableServer <- function(id
                    , table_id = table_id
                    , id_cols = id_cols
                    , uid_cols = uid_cols
-                   , sort_cols = id_cols
                    , skip_cols = skip_cols
                    , col_names = col_names
                    , type_list = type_list
