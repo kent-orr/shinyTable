@@ -97,7 +97,7 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 #' @param x A data.frame or reactive object containing the data to be displayed in the table.
 #' @param table_id An optional ID for the table. If not provided, the ID will default to the name of the input data.
 #' @param id_cols A numeric vector of column indices that should be displayed as static text.
-#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses.
+#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses. To set step use 'number-<step>' as in 'number-.01'
 #' @param col_names A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.
 #' @param skip_cols A numeric vector of column indices to skip during table generation.
 #' @param sortable either "asc" or "desc" or NULL, giving sort order or no sort at all
@@ -241,6 +241,6 @@ shinyTable <- function(x,
 }
 
 
-shinyTable(mtcars[1:5, 1:5]
-           , col_names = c("mpg" = "MPG")
-           , type_list = list("number-.01" = 2)) |> htmltools::html_print()
+# shinyTable(mtcars[1:5, 1:5]
+#            , col_names = c("mpg" = "MPG")
+#            , type_list = list("number-.01" = 2)) |> htmltools::html_print()
