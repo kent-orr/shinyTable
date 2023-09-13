@@ -207,7 +207,7 @@ shinyTable <- function(x,
   
   # Create the complete table
   tagList(
-    if(sortable %in% c("asc", "desc")) {
+    if(!is.null(sortable) && sortable %in% c("asc", "desc")) {
       tagList(
         
         tags$label(`for`=paste0(table_id, "-sort"), "Sort By")
