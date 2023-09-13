@@ -41,10 +41,11 @@ shinyTableUI <- function(id
   ns <- NS(id)
   tagList(
     tags$script(js_helpers)
-    , if (add_remove) 
+    , if (add_remove) {
       tags$div(actionButton(ns("add_row"), add_text, icon = icon("plus"))
-              , actionButton(ns("remove_row"), remove_text, icon = icon("minus"))
-              , if (sort) uiOutput(ns("sort")))
+              , actionButton(ns("remove_row"), remove_text, icon = icon("minus")))
+    }
+    , if (sort) uiOutput(ns("sort"))
     , uiOutput(ns("out"))
     , if (verbose) verbatimTextOutput(ns("console"))
   )
@@ -56,14 +57,15 @@ shinyTableUI <- function(id
 #'
 #' @param id The module ID.
 #' @param x A data frame or reactive data frame containing the data for the table.
-#' @param mode The mode for the table, either "data.frame", "inputs", or "both".
 #' @param table_id An optional ID for the table. If not provided, a default ID will be used.
 #' @param id_cols A numeric vector of column indices to be displayed as static text.
-#' @param sort_cols A numeric vector of column indices to use for sorting the table.
-#' @param col_names A character vector specifying custom column names for the table headers.
-#' @param uid_cols A numeric vector of column indices to be used as unique identifiers for each row.
-#' @param skip_cols A numeric vector of column indices to skip during table generation.
 #' @param type_list A list specifying input types for specific columns.
+#' @param col_names A character vector specifying custom column names for the table headers.
+#' @param skip_cols A numeric vector of column indices to skip during table generation.
+#' @param sortable A flag indicating if the table should be sortable (TRUE or FALSE).
+#' @param searchable A flag indicating if the table should be searchable (TRUE or FALSE).
+#' @param uid_cols A numeric vector of column indices to be used as unique identifiers for each row.
+#' @param mode The mode for the table, either "data.frame", "inputs", or "both".
 #' @param ... Additional arguments (currently not used).
 #'
 #' @return The module server function that defines the behavior of the shinyTable instance.
@@ -88,14 +90,15 @@ shinyTableUI <- function(id
 #'
 shinyTableServer <- function(id
                              , x
-                             , mode = "inputs"
                              , table_id = NULL
                              , id_cols = NULL
-                             , sort_cols = id_cols
-                             , col_names = NULL
-                             , uid_cols = NULL
-                             , skip_cols = NULL
                              , type_list = NULL
+                             , col_names = NULL
+                             , skip_cols = NULL
+                             , sortable = NULL
+                             , searchable = FALSE
+                             , uid_cols = NULL
+                             , mode = "inputs"
                              , ...
 ) {
   moduleServer(
@@ -149,7 +152,7 @@ shinyTableServer <- function(id
         x = sapply(sort_cols, \(x) if(x<0) "desc" else "asc")
         x = as.list(x)
         names(x) <- sort_cols
-        session$sendCustomMessage('sort_table', list(tableId = session$ns(table_id), sortingDict = x))
+        session$sendCustomMessage('sortTable', list(tableId = session$ns(table_id), sortingDict = x))
       })
       
       observeEvent(input$add_row, ignoreInit = TRUE, {
@@ -284,13 +287,20 @@ shinyTableServer <- function(id
 #' @export
 run_test <- function(mode = "data.frame") {
   ui <- fluidPage(
-    shinyTableUI("a", verbose = TRUE, sort = TRUE)
+    tags$script(hideRows)
+    , shinyTableUI("a", verbose = TRUE, sort = TRUE)
     , verbatimTextOutput("main_console")
   )
   
   server <- function(input, output, session) {
-    y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
-    x = shinyTableServer("a", y, mode = mode, table_id = "test_table", col_names = list("mpg" = "Miles per Gallon"), id_cols = 1)
+    y = mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
+    x = shinyTableServer("a"
+                         , y
+                         , table_id = "test_table"
+                         , mode = mode
+                         , col_names = list("mpg" = "Miles per Gallon")
+                         , id_cols = 1
+                         , )
     output$main_console <- renderPrint(x())
   }
   

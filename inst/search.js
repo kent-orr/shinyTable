@@ -7,7 +7,9 @@ function searchTable(x) {
 
   if (filter === "") {
     for (i = 1; i < tr.length; i++) {
-      tr[i].style.display = '';
+      if (tr[i].getAttribute('row_hidden') !== true) {
+        tr[i].style.display = '';
+      }
     }
   } else {
     for (i = 1; i < tr.length; i++) {
@@ -20,7 +22,9 @@ function searchTable(x) {
             txtValue = td[j].querySelector('input').value;
           }
           if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            tr[i].style.display = '';
+            if (tr[i].getAttribute('row_hidden') !== true) {
+              tr[i].style.display = '';
+            }
             break;
           }
         }
@@ -29,6 +33,6 @@ function searchTable(x) {
   }
 }
 
-Shiny.addCustomMessageHandler('search_table', function(message) {
+Shiny.addCustomMessageHandler('searchTable', function(message) {
   search_table(message.table_id)
 });

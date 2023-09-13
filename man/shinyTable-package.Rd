@@ -4,12 +4,12 @@
 \name{shinyTable-package}
 \alias{shinyTable}
 \alias{shinyTable-package}
-\title{shinyTable: What the Package Does (One Line, Title Case)}
+\title{shinyTable: Simple html tables built for shiny + CRUD operations}
 \description{
-What the package does (one paragraph).
+Generate html tables uing html inputs and an [i,j] grid for a more R native approach to interactive table editing in R's shiny framework.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Kent Orr \email{orrkent@pawpawanalytics.com}
 
 }
 \keyword{internal}
