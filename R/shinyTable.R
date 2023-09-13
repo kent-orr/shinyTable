@@ -80,7 +80,10 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              } else {
                NULL
              } # end placeholder
-             , step = if(type == "number") .01 else NULL
+             , step = if(grepl("number", type)) {
+               stp = strsplit(type, "-")[[1]]
+               if (length(stp) == 1) 1 else stp[2]
+             } 
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
@@ -209,6 +212,7 @@ shinyTable <- function(x,
         
         tags$label(`for`=paste0(table_id, "-sort"), "Sort By")
         , tags$select(name=paste0(table_id, "-sort")
+                      , class = "shinyTable-sort"
                       , onchange=paste0("(function(x){sort_table('", table_id, "', {[x.value]: '", sortable, "'})})(event.target)")
                       , lapply(names(x), \(nm) {
                         # browser()
@@ -237,4 +241,6 @@ shinyTable <- function(x,
 }
 
 
-# shinyTable(mtcars[1:5, 1:5], col_names = c("mpg" = "MPG")) |> htmltools::html_print()
+shinyTable(mtcars[1:5, 1:5]
+           , col_names = c("mpg" = "MPG")
+           , type_list = list("number-.01" = 2)) |> htmltools::html_print()
