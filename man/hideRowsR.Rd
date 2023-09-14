@@ -14,7 +14,7 @@ hideRowsR(table_id, hideIndex, session = getDefaultReactiveDomain())
 \description{
 This function sends a custom message to the Shiny session to hide rows from a table
 This function is useful because the hidden rows are unaffected by search, and also
-allow you to "filter" a table without interrupting the i,j index.
+allows you to "filter" a table without interrupting the i,j index.
 }
 \details{
 It is important to note that the rows are hidden, not removed, and in any
