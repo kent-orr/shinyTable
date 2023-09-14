@@ -48,7 +48,13 @@ observeEvent(input[['tab']], {
     uid = df[1, "unique_identifier"]
     jcol = names(df)[j]
     
-    dbExecute(conn, glue::glue("update table set '{jcol}' = '{value}' where unique_identifier = '{uid}'"))
+    dbExecute(conn, glue::glue(
+    "update 
+      table 
+    set 
+      '{jcol}' = '{value}' 
+    where 
+      unique_identifier = '{uid}'"))
   }
   
 })
