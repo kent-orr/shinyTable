@@ -9,7 +9,7 @@ generate_table_headers(x, col_names, skip_cols)
 \arguments{
 \item{x}{A data.frame or reactive object containing the data to be displayed in the table.}
 
-\item{col_names}{A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.}
+\item{col_names}{A character vector specifying custom column names for the table headers \code{new_name = old_name}. If not provided, column names from the input data will be used.}
 
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
 }

@@ -2,68 +2,61 @@
 % Please edit documentation in R/shiny_functions.R
 \name{shinyTableServer}
 \alias{shinyTableServer}
-\title{Server logic for a shinyTable instance}
+\title{Shiny Table Server Module}
 \usage{
 shinyTableServer(
   id,
   x,
-  table_id = NULL,
+  table_id = "tab",
+  shiny_search = TRUE,
+  shiny_sort = "asc",
   id_cols = NULL,
-  type_list = NULL,
   col_names = NULL,
   skip_cols = NULL,
-  sortable = NULL,
-  searchable = FALSE,
+  type_list = NULL,
   uid_cols = NULL,
-  mode = "inputs",
-  ...
+  mode = "inputs"
 )
 }
 \arguments{
-\item{id}{The module ID.}
+\item{id}{A unique ID to identify the module server instance.}
 
-\item{x}{A data frame or reactive data frame containing the data for the table.}
+\item{x}{A data.frame or reactive object containing the data to be displayed in the table.}
 
-\item{table_id}{An optional ID for the table. If not provided, a default ID will be used.}
+\item{table_id}{An optional ID for the table. If not provided, the ID will default to the name of the input data.}
 
-\item{id_cols}{A numeric vector of column indices to be displayed as static text.}
+\item{shiny_search}{A parameter to define if the search functionality should be done via shiny. Should match value provided in shinyTableUI. Default is TRUE.}
 
-\item{type_list}{A list specifying input types for specific columns.}
+\item{shiny_sort}{A parameter to define the sort functionality should be done via shiny. Should match value provided in shinyTableUI. Default is "asc", use NULL or false to use shinyTable sort.}
 
-\item{col_names}{A character vector specifying custom column names for the table headers.}
+\item{id_cols}{A numeric vector of column indices that should be displayed as static text.}
+
+\item{col_names}{A character vector specifying custom column names for the table headers \code{new_name = old_name}. If not provided, column names from the input data will be used.}
 
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
 
-\item{sortable}{A flag indicating if the table should be sortable (TRUE or FALSE).}
+\item{type_list}{A list specifying input types for specific columns. The format should be \code{list(input_type = c(column_indices))}. Column input types are guessed using \code{shinyTable:::get_column_input_type}, and this argument can be used to override the guesses. To set step use 'number-\if{html}{\out{<step>}}' as in 'number-.01'}
 
-\item{searchable}{A flag indicating if the table should be searchable (TRUE or FALSE).}
+\item{uid_cols}{A vector specifying the columns that contain unique ID information. Default is NULL.}
 
-\item{uid_cols}{A numeric vector of column indices to be used as unique identifiers for each row.}
-
-\item{mode}{The mode for the table, either "data.frame", "inputs", or "both".}
-
-\item{...}{Additional arguments (currently not used).}
+\item{mode}{A string specifying the mode of the module ("inputs" or "data.frame" or "both). Default is "inputs".}
 }
 \value{
-The module server function that defines the behavior of the shinyTable instance.
+A reactive expression containing the user inputs or the current data frame based on the specified mode.
 }
 \description{
-This module provides the server logic for a shinyTable instance, which allows you to create and manage an editable HTML table within a Shiny application.
+This module serves a Shiny table which supports a variety of functionalities including sorting, searching,
+adding and removing rows, etc. It also manages the user input and output in the server side of a Shiny application.
 }
 \examples{
-
-# Use the module in the UI
-ui <- fluidPage(
-  shinyTableUI("table_module"),
-  # Other UI elements...
-)
-
-# Define server logic for the UI
-server <- function(input, output, session) {
-  shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
-  # Other server logic...
-}
-
-shinyApp(ui, server)
+# To use this module in a Shiny app, you would typically call shinyTableServer in the server function
+# and shinyTableUI in the UI function. For example:
+# server <- function(input, output, session) {
+#   shinyTableServer("table1", reactive({ data.frame(x = 1:10, y = 11:20) }))
+# }
+# ui <- fluidPage(
+#   shinyTableUI("table1")
+# )
+# shinyApp(ui, server)
 
 }

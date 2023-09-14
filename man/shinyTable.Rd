@@ -26,7 +26,7 @@ shinyTable(
 
 \item{type_list}{A list specifying input types for specific columns. The format should be \code{list(input_type = c(column_indices))}. Column input types are guessed using \code{shinyTable:::get_column_input_type}, and this argument can be used to override the guesses. To set step use 'number-\if{html}{\out{<step>}}' as in 'number-.01'}
 
-\item{col_names}{A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.}
+\item{col_names}{A character vector specifying custom column names for the table headers \code{new_name = old_name}. If not provided, column names from the input data will be used.}
 
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
 
