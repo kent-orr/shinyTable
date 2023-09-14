@@ -333,16 +333,16 @@ shinyTableServer = function(id
 # end server --------------------------------------------------------------
 
 
-run_test <- function(mode = "inputs") {
+run_test <- function(mode = "both", options = "test.mode") {
   ui <- fluidPage(
-    shinyTableUI("a", shiny_sort = TRUE, shiny_search = TRUE)
+    shinyTableUI("module_id", shiny_sort = TRUE, shiny_search = TRUE)
     , verbatimTextOutput("main_console")
   )
   
   server <- function(input, output, session) {
     y = mtcars[1:5, 1:2]; y$newcol = c(TRUE, FALSE, TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
     y = cbind(list("name" = c("A", "C", "B", "B", "C")), y)
-    x = shinyTableServer("a"
+    x = shinyTableServer("module_id"
                          , y
                          , table_id = "tab"
                          , shiny_sort = "asc"
