@@ -47,6 +47,21 @@ searchTableR <- function(table_id, searchString, session = getDefaultReactiveDom
                                    , value = searchString))
 }
 
+#' Hide table rows in a Shiny App
+#'
+#' This function sends a custom message to the Shiny session to hide rows from a table
+#' This function is useful because the hidden rows are unaffected by search, and also
+#' allows you to "filter" a table without interrupting the i,j index. 
+#' 
+#' It is important to note that the rows are hidden, not removed, and in any 
+#' case they are rendered before being hidden. Any information
+#' contained in rows is still available as html, and so is not secure. 
+#'
+#' @inheritParams sortTableR
+hideRowsR <- function(table_id, hideIndex, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage("hideRowsMessage"
+                            , list(table_id = table_id, hideIndex = hideIndex))
+}
 
 #' Shiny Table UI
 #'
@@ -85,7 +100,7 @@ shinyTableUI <- function(id
       textInput(ns("search"), "Search", value = "", width = "100%"),
     
     # If shiny_sort is TRUE or non-null, add a sorting script and UI output for sorting functionality
-    if (!is.null(shiny_sort) | isTRUE(shiny_sort)) 
+    if (shiny_sort) 
       tagList(tags$script(sortTable), 
               uiOutput(ns("sort")) 
               ),
@@ -116,6 +131,8 @@ shinyTableUI <- function(id
 #' @param mode A string specifying the mode of the module ("inputs" or "data.frame" or "both). Default is "inputs".
 #'
 #' @return A reactive expression containing the user inputs or the current data frame based on the specified mode.
+#' 
+#' @export
 #' 
 #' @examples
 #' # To use this module in a Shiny app, you would typically call shinyTableServer in the server function
@@ -151,7 +168,7 @@ shinyTableServer = function(id
       shinyTable(init()
                  , table_id = table_id
                  , searchable = !shiny_search
-                 , sortable = !is.character(shiny_sort)
+                 , sortable = if (isFALSE(shiny_sort)) FALSE else shiny_sort
                  , id_cols = id_cols
                  , col_names = col_names
                  , skip_cols = skip_cols
