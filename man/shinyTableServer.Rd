@@ -7,14 +7,15 @@
 shinyTableServer(
   id,
   x,
-  mode = "inputs",
   table_id = NULL,
   id_cols = NULL,
-  sort_cols = id_cols,
-  col_names = NULL,
-  uid_cols = NULL,
-  skip_cols = NULL,
   type_list = NULL,
+  col_names = NULL,
+  skip_cols = NULL,
+  sortable = NULL,
+  searchable = FALSE,
+  uid_cols = NULL,
+  mode = "inputs",
   ...
 )
 }
@@ -23,21 +24,23 @@ shinyTableServer(
 
 \item{x}{A data frame or reactive data frame containing the data for the table.}
 
-\item{mode}{The mode for the table, either "data.frame", "inputs", or "both".}
-
 \item{table_id}{An optional ID for the table. If not provided, a default ID will be used.}
 
 \item{id_cols}{A numeric vector of column indices to be displayed as static text.}
 
-\item{sort_cols}{A numeric vector of column indices to use for sorting the table.}
+\item{type_list}{A list specifying input types for specific columns.}
 
 \item{col_names}{A character vector specifying custom column names for the table headers.}
 
-\item{uid_cols}{A numeric vector of column indices to be used as unique identifiers for each row.}
-
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
 
-\item{type_list}{A list specifying input types for specific columns.}
+\item{sortable}{A flag indicating if the table should be sortable (TRUE or FALSE).}
+
+\item{searchable}{A flag indicating if the table should be searchable (TRUE or FALSE).}
+
+\item{uid_cols}{A numeric vector of column indices to be used as unique identifiers for each row.}
+
+\item{mode}{The mode for the table, either "data.frame", "inputs", or "both".}
 
 \item{...}{Additional arguments (currently not used).}
 }

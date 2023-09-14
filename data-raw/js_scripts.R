@@ -1,8 +1,8 @@
 ## code to prepare `js_scripts` dataset goes here
 inputChange = readLines("inst/inputChange.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML()
 js_helpers = readLines("inst/helpers.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
-searchTable = readLines("inst/search.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
-sortTable = readLines("inst/sort.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
+searchTable = readLines("inst/searchTable.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
+sortTable = readLines("inst/sortTable.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
 hideRows = readLines("inst/hideRows.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
 
 

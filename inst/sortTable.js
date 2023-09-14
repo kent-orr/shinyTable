@@ -1,4 +1,4 @@
-function sort_table(tableId, sortDict) {
+function sortTable(tableId, sortDict) {
   // Step 1: Select the table and the tbody
   const table = document.getElementById(tableId);
   const tbody = table.querySelector('tbody');
@@ -34,6 +34,6 @@ function sort_table(tableId, sortDict) {
   rows.forEach(row => tbody.appendChild(row));
 }
 
-Shiny.addCustomMessageHandler('sort_table', function(message) {
-  sort_table(message.tableId, message.sortingDict)
+Shiny.addCustomMessageHandler('sortTableMessage', function(message) {
+  sortTable(message.tableId, message.sortDict)
 });

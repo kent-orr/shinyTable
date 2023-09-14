@@ -6,16 +6,16 @@ function hideRows(table_id, hideIndex) {
   for (i = 1; i < rows.length; i++) {
     if (hideIndex.includes(i)) {
       rows[i].style.display = 'none';
-      rows[i].setAttribute('row_hidden', true);
+      rows[i].setAttribute('shinyTable-hidden', true);
       
     } else {
       rows[i].style.display = '';
-      rows[i].setAttribute('row_hidden', false);
+      rows[i].setAttribute('shinyTable-hidden', false);
     }
   }
   
 }
 
-Shiny.addCustomMessageHandler('hideRows', function(message) {
+Shiny.addCustomMessageHandler('hideRowsMessage', function(message) {
   hideRows(message.table_id, message.hideIndex)
 })
