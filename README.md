@@ -2,9 +2,18 @@
 ## Interactive Table Editing in Shiny
 
 shinyTable is a simple means of creating editable html tables that focuses on 
-bringing a more R native way to handle edits. shinyTable makes simple html tables
-of inputs, each with `i`, `j` values that are gathered on input. The idea is to 
-use the indexing of base R to make changes, such that `x[i, j] <- input_value`
+bringing a more R native way to handle edits. shinyTable makes a simple grid of inputs, 
+each with `i`, `j` values that are gathered as a reactive input. 
+
+```
+(i, j)
+     [,1]    [,2]    [,3]   
+[1,] "(1,1)" "(1,2)" "(1,3)"
+[2,] "(2,1)" "(2,2)" "(2,3)"
+[3,] "(3,1)" "(3,2)" "(3,3)"
+```
+
+The idea is to use the indexing of base R to make changes, such that `x[i, j] <- input_value`
 
 For example: the vale of `input$tab` for a `shinyTable` with `table_id="tab"` after editing row 1 column 7 t be a value of "new_value" would be as follows:
 
