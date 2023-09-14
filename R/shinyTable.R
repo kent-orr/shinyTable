@@ -117,7 +117,6 @@ generate_table_headers <- function(x, col_names, skip_cols) {
 #'
 #' @inheritParams shinyTable
 #'
-#' @return
 #' @export
 #'
 #' @examples
@@ -151,7 +150,7 @@ generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
 #' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses. To set step use 'number-<step>' as in 'number-.01'
 #' @param col_names A character vector specifying custom column names for the table headers `new_name = old_name`. If not provided, column names from the input data will be used.
 #' @param skip_cols A numeric vector of column indices to skip during table generation.
-#' @param sortable either "asc" or "desc" or NULL, giving sort order or no sort at all
+#' @param sortable either "asc" or "desc" or FALSE, giving sort order or no sort at all
 #' @param searchable A boolean to indicate if a search box should be implemented.
 #' @param ns The namespace of the Shiny module if used within a module context.
 #' @param ... Additional arguments (currently not used).
@@ -229,7 +228,7 @@ shinyTable <- function(x,
   
   # Create the complete table
   tagList(
-    if(!is.null(sortable) && sortable %in% c("asc", "desc")) {
+    if(sortable %in% c("asc", "desc")) {
       tagList(
         
         tags$label(`for`=paste0(table_id, "-sort"), "Sort By")

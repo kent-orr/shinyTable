@@ -30,7 +30,7 @@ shinyTable(
 
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
 
-\item{sortable}{either "asc" or "desc" or NULL, giving sort order or no sort at all}
+\item{sortable}{either "asc" or "desc" or FALSE, giving sort order or no sort at all}
 
 \item{searchable}{A boolean to indicate if a search box should be implemented.}
 
