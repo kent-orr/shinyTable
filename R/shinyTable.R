@@ -153,7 +153,11 @@ generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
 #' @param sortable either "asc" or "desc" or FALSE, giving sort order or no sort at all
 #' @param searchable A boolean to indicate if a search box should be implemented.
 #' @param ns The namespace of the Shiny module if used within a module context.
-#' @param ... Additional arguments (currently not used).
+#' @param ... Additional arguments (see details).
+#'
+#' @details
+#' the ... contains optional pieces of code tobe inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created. 
+#' 
 #'
 #' @return An HTML table with interactive input cells and static text cells based on the provided data and parameters.
 #'

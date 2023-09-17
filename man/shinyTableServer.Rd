@@ -25,9 +25,9 @@ shinyTableServer(
 
 \item{table_id}{An optional ID for the table. If not provided, the ID will default to the name of the input data.}
 
-\item{shiny_search}{A parameter to define if the search functionality should be done via shiny. Should match value provided in shinyTableUI. Default is TRUE.}
+\item{shiny_search}{A parameter to define if the search functionality should be done via shiny. NULL means no search, FALSE means search is done via js with table input, TRUE means a shiny input will manage search.}
 
-\item{shiny_sort}{A parameter to define the sort functionality should be done via shiny. Should match value provided in shinyTableUI. Default is "asc", use NULL or false to use shinyTable sort.}
+\item{shiny_sort}{A parameter to define if the sort functionality should be done via shiny. NULL means no search, FALSE means ascending sort is done via js with table input, "asc" or "desc" means a shiny input will manage search.}
 
 \item{id_cols}{A numeric vector of column indices that should be displayed as static text.}
 

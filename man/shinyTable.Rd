@@ -36,13 +36,16 @@ shinyTable(
 
 \item{ns}{The namespace of the Shiny module if used within a module context.}
 
-\item{...}{Additional arguments (currently not used).}
+\item{...}{Additional arguments (see details).}
 }
 \value{
 An HTML table with interactive input cells and static text cells based on the provided data and parameters.
 }
 \description{
 This function generates an editable HTML table based on the provided data. It can be used in Shiny applications to display and interact with tabular data.
+}
+\details{
+the ... contains optional pieces of code tobe inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created.
 }
 \examples{
 # Generate a simple editable table with default settings
