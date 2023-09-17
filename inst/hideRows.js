@@ -1,7 +1,14 @@
 function hideRows(table_id, hideIndex) {
   if (typeof(hideIndex) === "number") { hideIndex = [hideIndex] }
   var table = document.getElementById(table_id)
-  rows = table.getElementsByTagName('tr');
+  rows = Array.prototype.slice.call(table.getElementsByTagName('tr'));
+
+  rows.sort((a, b) => {
+    var aI = parseInt(a.getAttribute('i')),
+        bI = parseInt(b.getAttribute('i'));
+  
+    return aI - bI;
+  });
   
   for (i = 1; i < rows.length; i++) {
     if (hideIndex.includes(i)) {
