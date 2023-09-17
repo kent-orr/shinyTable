@@ -180,6 +180,12 @@ shinyTable <- function(x,
                        ns = NULL,
                        ...) {
   # browser()
+  
+  if (!missing(...)) {
+    extra = list(...)
+    scripts = lapply(extra[["scripts"]], tags$script)
+  }
+  
   if (shiny::is.reactive(x)) x = x()
   
   if (is.null(x) || nrow(x) == 0)
@@ -225,7 +231,7 @@ shinyTable <- function(x,
   tg = tags$colgroup(lapply(setdiff(1:ncol(x), skip_cols), \(j) {
     tags$col(j=j)
   }))
-  
+  # browser()
   # Create the complete table
   tagList(
     if(!is.null(sortable) && sortable %in% c("asc", "desc")) {
@@ -248,7 +254,9 @@ shinyTable <- function(x,
       tags$input(type="text", class = "shinyTable-search", id = paste0(table_id, "-search"), onkeyup="searchTable(this)")
       )
     } # end if searchable
+    
     , tags$table(tg, th, tb, id = table_id, width="100%")
+    , if (!missing(scripts)) tagList(scripts)
     , tags$script(hideRows)
     , tags$script(inputChange)
     , tags$script(searchTable)
@@ -260,6 +268,8 @@ if (interactive())
   htmltools::html_print(
     shinyTable(mtcars[1:5, 1:5]
                , col_names = c("MPG" = "mpg")
-               , type_list = list("number-.01" = 2))
+               , type_list = list("number-.01" = 2)
+               , scripts = c("console.log('hey');", "console.log('butt');")
+               )
   )
 
