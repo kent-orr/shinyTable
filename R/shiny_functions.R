@@ -58,6 +58,8 @@ searchTableR <- function(table_id, searchString, session = getDefaultReactiveDom
 #' contained in rows is still available as html, and so is not secure. 
 #'
 #' @inheritParams sortTableR
+#' 
+#' @export
 hideRowsR <- function(table_id, hideIndex, session = getDefaultReactiveDomain()) {
   session$sendCustomMessage("hideRowsMessage"
                             , list(table_id = table_id, hideIndex = hideIndex))
@@ -125,8 +127,8 @@ shinyTableUI <- function(id
 #'
 #' @param id A unique ID to identify the module server instance.
 #' @inheritParams shinyTable
-#' @param shiny_search A parameter to define if the search functionality should be done via shiny. Should match value provided in shinyTableUI. Default is TRUE.
-#' @param shiny_sort A parameter to define the sort functionality should be done via shiny. Should match value provided in shinyTableUI. Default is "asc", use NULL or false to use shinyTable sort. 
+#' @param shiny_search A parameter to define if the search functionality should be done via shiny. NULL means no search, FALSE means search is done via js with table input, TRUE means a shiny input will manage search. 
+#' @param shiny_sort A parameter to define if the sort functionality should be done via shiny. NULL means no search, FALSE means ascending sort is done via js with table input, "asc" or "desc" means a shiny input will manage search. 
 #' @param uid_cols A vector specifying the columns that contain unique ID information. Default is NULL.
 #' @param mode A string specifying the mode of the module ("inputs" or "data.frame" or "both). Default is "inputs".
 #'
@@ -167,8 +169,8 @@ shinyTableServer = function(id
     output$table <- renderUI({
       shinyTable(init()
                  , table_id = table_id
-                 , searchable = !shiny_search
-                 , sortable = if (isFALSE(shiny_sort)) FALSE else shiny_sort
+                 , searchable = if (is.null(shiny_search)) NULL else !shiny_search
+                 , sortable = if (is.null(shiny_sort)) NULL else if (isFALSE(shiny_sort)) FALSE else shiny_sort
                  , id_cols = id_cols
                  , col_names = col_names
                  , skip_cols = skip_cols
