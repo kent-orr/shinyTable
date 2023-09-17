@@ -7,7 +7,7 @@ function searchTable(x) {
 
   if (filter === "") {
     for (i = 1; i < tr.length; i++) {
-      if (tr[i].getAttribute('shinyTable-hidden') !== true) {
+      if (tr[i].getAttribute('shinyTable-hidden') !== 'true') {
         tr[i].style.display = '';
       }
     }
@@ -22,7 +22,7 @@ function searchTable(x) {
             txtValue = td[j].querySelector('input').value;
           }
           if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            if (tr[i].getAttribute('shinyTable-hidden') !== true) {
+            if (tr[i].getAttribute('shinyTable-hidden') !== 'true') {
               tr[i].style.display = '';
             }
             break;
@@ -41,7 +41,7 @@ function searchTableMessage(x) {
 
   if (filter === "") {
     for (i = 1; i < tr.length; i++) {
-      if (tr[i].getAttribute('shinyTable-hidden') !== true) {
+      if (tr[i].getAttribute('shinyTable-hidden') !== 'true') {
         tr[i].style.display = '';
       }
     }
@@ -56,7 +56,7 @@ function searchTableMessage(x) {
             txtValue = td[j].querySelector('input').value;
           }
           if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            if (tr[i].getAttribute('shinyTable-hidden') !== true) {
+            if (tr[i].getAttribute('shinyTable-hidden') !== 'true') {
               tr[i].style.display = '';
             }
             break;
