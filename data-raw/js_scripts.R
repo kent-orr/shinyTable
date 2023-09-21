@@ -12,4 +12,4 @@ for (filename in list.files("inst")) {
   i = i + 1
 }
 
-usethis::use_data(hideRows, inputChange, searchTable, sortTable, updateInput, compress = "bzip2")
+usethis::use_data(hideRows, inputChange, searchTable, sortTable, updateInput, compress = "bzip2", overwrite = TRUE)
