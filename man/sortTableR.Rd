@@ -4,10 +4,10 @@
 \alias{sortTableR}
 \title{Sort Table in a Shiny App}
 \usage{
-sortTableR(table_id, sortDict, session = getDefaultReactiveDomain())
+sortTableR(tableId, sortDict, session = getDefaultReactiveDomain())
 }
 \arguments{
-\item{table_id}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
+\item{tableId}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
 
 \item{sortDict}{A list specifying the sorting parameters. The names of the list are the column names and the list values are the sorting directions (e.g., 'asc' for ascending).}
 

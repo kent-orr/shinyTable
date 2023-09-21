@@ -3,7 +3,7 @@
 \docType{data}
 \name{hideRows}
 \alias{hideRows}
-\title{hideRows}
+\title{hideRows js function}
 \format{
 An object of class \code{html} (inherits from \code{character}) of length 1.
 }
@@ -11,6 +11,6 @@ An object of class \code{html} (inherits from \code{character}) of length 1.
 hideRows
 }
 \description{
-hideRows
+hideRows js function
 }
 \keyword{datasets}

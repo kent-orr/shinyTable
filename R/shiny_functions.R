@@ -1,8 +1,23 @@
+#' update a table's input and fire off table input with action: value_change
+#'
+#' @inheritParams sortTableR
+#' @param i the i index / attribute
+#' @param j the j index / attribute
+#' @param value the new value to replace the input
+#'
+#' @export
+updateInputR <- function(tableId, i, j, value) {
+  session$sendCustomMessage("sortTableMessage", list(tableId = tableId
+                                                     , i = i
+                                                     , j = j
+                                                     , value = value))
+}
+
 #' Sort Table in a Shiny App
 #'
 #' This function sends a custom message to the Shiny session to sort a table based on the given parameters.
 #' 
-#' @param table_id A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.
+#' @param tableId A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.
 #' @param sortDict A list specifying the sorting parameters. The names of the list are the column names and the list values are the sorting directions (e.g., 'asc' for ascending).
 #' @param session A reactive domain (usually from `shiny::getDefaultReactiveDomain()`), representing the Shiny session. Defaults to the current session.
 #' 
@@ -18,8 +33,8 @@
 #' \code{\link[shiny]{getDefaultReactiveDomain}}
 #' 
 #' @export
-sortTableR <- function(table_id, sortDict, session = getDefaultReactiveDomain()) {
-  session$sendCustomMessage("sortTableMessage", list(tableId = table_id, sortDict = sortDict))
+sortTableR <- function(tableId, sortDict, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage("sortTableMessage", list(tableId = tableId, sortDict = sortDict))
 }
 
 #' Search Table in a Shiny App
@@ -41,9 +56,9 @@ sortTableR <- function(table_id, sortDict, session = getDefaultReactiveDomain())
 #' \code{\link[shiny]{getDefaultReactiveDomain}}
 #' 
 #' @export
-searchTableR <- function(table_id, searchString, session = getDefaultReactiveDomain()) {
+searchTableR <- function(tableId, searchString, session = getDefaultReactiveDomain()) {
   session$sendCustomMessage('searchTableMessage'
-                            , list(table_id = table_id 
+                            , list(tableId = tableId
                                    , value = searchString))
 }
 
@@ -60,9 +75,9 @@ searchTableR <- function(table_id, searchString, session = getDefaultReactiveDom
 #' @inheritParams sortTableR
 #' 
 #' @export
-hideRowsR <- function(table_id, hideIndex, session = getDefaultReactiveDomain()) {
+hideRowsR <- function(tableId, hideIndex, session = getDefaultReactiveDomain()) {
   session$sendCustomMessage("hideRowsMessage"
-                            , list(table_id = table_id, hideIndex = hideIndex))
+                            , list(tableId = tableId, hideIndex = hideIndex))
 }
 
 #' Shiny Table UI
@@ -374,4 +389,4 @@ run_test <- function(mode = "both", options = "test.mode") {
   shiny::shinyApp(ui, server)
 }
 
-if (interactive()) run_test(mode = "inputs")
+# if (interactive()) run_test(mode = "inputs")

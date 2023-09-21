@@ -3,7 +3,7 @@
 \docType{data}
 \name{sortTable}
 \alias{sortTable}
-\title{sortTable}
+\title{sortTable js function}
 \format{
 An object of class \code{html} (inherits from \code{character}) of length 1.
 }
@@ -11,6 +11,6 @@ An object of class \code{html} (inherits from \code{character}) of length 1.
 sortTable
 }
 \description{
-sortTable
+sortTable js function
 }
 \keyword{datasets}

@@ -87,7 +87,8 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
-             style='transition:5s; position:relative; border:none; width:"100%"')
+             style='transition:5s; position:relative; border:none; width:"100%"',
+             onfocus='inputSelect(this)')
 }
 
 #' Geerate table header row
@@ -156,7 +157,7 @@ generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
 #' @param ... Additional arguments (see details).
 #'
 #' @details
-#' the ... contains optional pieces of code tobe inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created. 
+#' the ... contains optional pieces of code to be inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created. There are 2 events that can be scripted, `trSelect` which is an onclick for the <tr> elements in each table, and `inputSelect` which is an onfocus for the <input> elements.
 #' 
 #'
 #' @return An HTML table with interactive input cells and static text cells based on the provided data and parameters.
@@ -268,12 +269,12 @@ shinyTable <- function(x,
   )
 }
 
-if (interactive()) 
-  htmltools::html_print(
-    shinyTable(mtcars[1:5, 1:5]
-               , col_names = c("MPG" = "mpg")
-               , type_list = list("number-.01" = 2)
-               , scripts = c("console.log('hey');", "console.log('butt');")
-               )
-  )
+# if (interactive()) 
+#   htmltools::html_print(
+#     shinyTable(mtcars[1:5, 1:5]
+#                , col_names = c("MPG" = "mpg")
+#                , type_list = list("number-.01" = 2)
+#                , scripts = c("console.log('hey');", "console.log('butt');")
+#                )
+#   )
 

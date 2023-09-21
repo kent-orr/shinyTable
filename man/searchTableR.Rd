@@ -4,10 +4,10 @@
 \alias{searchTableR}
 \title{Search Table in a Shiny App}
 \usage{
-searchTableR(table_id, searchString, session = getDefaultReactiveDomain())
+searchTableR(tableId, searchString, session = getDefaultReactiveDomain())
 }
 \arguments{
-\item{table_id}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
+\item{tableId}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
 
 \item{searchString}{A string representing the search query that will be used to filter the table.}
 

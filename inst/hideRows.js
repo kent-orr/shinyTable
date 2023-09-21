@@ -1,6 +1,6 @@
-function hideRows(table_id, hideIndex) {
+function hideRows(tableId, hideIndex) {
   if (typeof(hideIndex) === "number") { hideIndex = [hideIndex] }
-  var table = document.getElementById(table_id)
+  var table = document.getElementById(tableId)
   rows = Array.prototype.slice.call(table.getElementsByTagName('tr'));
 
   rows.sort((a, b) => {
@@ -24,5 +24,5 @@ function hideRows(table_id, hideIndex) {
 }
 
 Shiny.addCustomMessageHandler('hideRowsMessage', function(message) {
-  hideRows(message.table_id, message.hideIndex)
+  hideRows(message.tableId, message.hideIndex)
 })

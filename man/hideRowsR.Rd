@@ -4,10 +4,10 @@
 \alias{hideRowsR}
 \title{Hide table rows in a Shiny App}
 \usage{
-hideRowsR(table_id, hideIndex, session = getDefaultReactiveDomain())
+hideRowsR(tableId, hideIndex, session = getDefaultReactiveDomain())
 }
 \arguments{
-\item{table_id}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
+\item{tableId}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
 
 \item{session}{A reactive domain (usually from \code{shiny::getDefaultReactiveDomain()}), representing the Shiny session. Defaults to the current session.}
 }

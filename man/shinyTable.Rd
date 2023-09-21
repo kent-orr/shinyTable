@@ -45,7 +45,7 @@ An HTML table with interactive input cells and static text cells based on the pr
 This function generates an editable HTML table based on the provided data. It can be used in Shiny applications to display and interact with tabular data.
 }
 \details{
-the ... contains optional pieces of code tobe inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created.
+the ... contains optional pieces of code to be inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created. There are 2 events that can be scripted, \code{trSelect} which is an onclick for the \if{html}{\out{<tr>}} elements in each table, and \code{inputSelect} which is an onfocus for the \if{html}{\out{<input>}} elements.
 }
 \examples{
 # Generate a simple editable table with default settings

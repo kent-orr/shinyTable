@@ -3,7 +3,7 @@
 \docType{data}
 \name{searchTable}
 \alias{searchTable}
-\title{searchTable}
+\title{searchTable js function}
 \format{
 An object of class \code{html} (inherits from \code{character}) of length 1.
 }
@@ -11,6 +11,6 @@ An object of class \code{html} (inherits from \code{character}) of length 1.
 searchTable
 }
 \description{
-searchTable
+searchTable js function
 }
 \keyword{datasets}

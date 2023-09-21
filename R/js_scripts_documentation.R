@@ -1,19 +1,20 @@
+#' hideRows js function
+#'
+'hideRows'
+
 #' inputChange js function
-#' 
-"inputChange"
+#'
+'inputChange'
 
-#' js helpers
-#' 
-"js_helpers"
+#' searchTable js function
+#'
+'searchTable'
 
-#' searchTable
-#' 
-"searchTable"
+#' sortTable js function
+#'
+'sortTable'
 
-#' sortTable
-#' 
-"sortTable"
+#' updateInput js function
+#'
+'updateInput'
 
-#' hideRows
-#' 
-"hideRows"
