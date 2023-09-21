@@ -4,7 +4,15 @@
 \alias{uid}
 \title{Create a uid based on system time}
 \usage{
-uid()
+uid(...)
+}
+\arguments{
+\item{...}{additional uids to avoid time confrontations. For example, a user
+uid in addition to the system time to ensure that simultaneous edits by two
+users are still unique records
+
+Note that the hash is created by crc32, and is not recommended to be used to
+hide sensitive information like an email or other identifying records}
 }
 \description{
 Create a uid based on system time

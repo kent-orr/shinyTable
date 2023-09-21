@@ -11,6 +11,8 @@ shinyTable(
   type_list = NULL,
   col_names = NULL,
   skip_cols = NULL,
+  sortable = "asc",
+  searchable = TRUE,
   ns = NULL,
   ...
 )
@@ -22,21 +24,28 @@ shinyTable(
 
 \item{id_cols}{A numeric vector of column indices that should be displayed as static text.}
 
-\item{type_list}{A list specifying input types for specific columns. The format should be \code{list(input_type = c(column_indices))}. Column input types are guessed using \code{shinyTable:::get_column_input_type}, and this argument can be used to override the guesses.}
+\item{type_list}{A list specifying input types for specific columns. The format should be \code{list(input_type = c(column_indices))}. Column input types are guessed using \code{shinyTable:::get_column_input_type}, and this argument can be used to override the guesses. To set step use 'number-\if{html}{\out{<step>}}' as in 'number-.01'}
 
-\item{col_names}{A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.}
+\item{col_names}{A character vector specifying custom column names for the table headers \code{new_name = old_name}. If not provided, column names from the input data will be used.}
 
 \item{skip_cols}{A numeric vector of column indices to skip during table generation.}
 
+\item{sortable}{either "asc" or "desc" or FALSE, giving sort order or no sort at all}
+
+\item{searchable}{A boolean to indicate if a search box should be implemented.}
+
 \item{ns}{The namespace of the Shiny module if used within a module context.}
 
-\item{...}{Additional arguments (currently not used).}
+\item{...}{Additional arguments (see details).}
 }
 \value{
 An HTML table with interactive input cells and static text cells based on the provided data and parameters.
 }
 \description{
 This function generates an editable HTML table based on the provided data. It can be used in Shiny applications to display and interact with tabular data.
+}
+\details{
+the ... contains optional pieces of code to be inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created. There are 2 events that can be scripted, \code{trSelect} which is an onclick for the \if{html}{\out{<tr>}} elements in each table, and \code{inputSelect} which is an onfocus for the \if{html}{\out{<input>}} elements.
 }
 \examples{
 # Generate a simple editable table with default settings

@@ -66,7 +66,7 @@ test_that("generate_tags_input works correctly", {
 })
 
 
-test_that("shiny_table works correctly", {
+test_that("shinyTable works correctly", {
   data <- data.frame(
     id = 1:3,
     name = c("Alice", "Bob", "Charlie"),
@@ -76,37 +76,37 @@ test_that("shiny_table works correctly", {
   )
   
   # Test 1: table_id, id_cols, type_list, and skip_cols are default (NULL)
-  table1 <- shiny_table(data)
-  expect_equal(table1[[1]]$name, "table")
-  expect_equal(table1[[1]]$attribs$id, "st_data")
-  expect_equal(length(table1[[1]]$children[[1]]$children[[1]])
+  table1 <- shinyTable(data)
+  expect_equal(table1[[3]]$name, "table")
+  expect_equal(table1[[3]]$attribs$id, "data")
+  expect_equal(length(table1[[3]]$children[[1]]$children[[1]])
                , ncol(data))  # number of columns
-  expect_equal(length(table1[[1]]$children[[2]]$children)
+  expect_equal(length(table1[[3]]$children[[3]]$children[1][[1]])
                , nrow(data))  # number of rows
   
   # Test 2: table_id, id_cols, type_list, and skip_cols are specified
-  table2 <- shiny_table(data, table_id = "test_table", id_cols = 2,
+  table2 <- shinyTable(data, table_id = "test_table", id_cols = 2,
                         type_list = list(text = 1, checkbox = 3, tel = 4
                         ),
                         skip_cols = 1
   )
   
   
-  expect_equal(table2[[1]]$attribs$id, "st_test_table")
-  expect_equal(length(table2[[1]]$children[[1]]$children[[1]])
+  expect_equal(table2[[3]]$attribs$id, "test_table")
+  expect_equal(length(table2[[3]]$children[[1]]$children[[1]])
                , ncol(data) - 1)  # number of columns
-  expect_equal(length(table2[[1]]$children[[2]]$children[[1]]) - 1
+  expect_equal(length(table2[[3]]$children[[2]]$children[[1]]) - 1
                , nrow(data))  # number of rows (header row is a NULL child)
   
   # Test 3: id argument is specified
-  table3 <- shiny_table(data, id = "module1")
-  expect_equal(attr(table3[[1]], "id"), "st_module1_data")
+  table3 <- shinyTable(data, table_id = "module1")
+  expect_equal(htmltools::tagGetAttribute(table3[[3]], "id"), "module1")
   
   # Test 4: id_cols includes all columns
-  table4 <- shiny_table(data, id_cols = 1:ncol(data))
+  table4 <- shinyTable(data, id_cols = 1:ncol(data))
   # Check that all columns are rendered as static text
   all_static_text <-
-    sapply(table4[[1]]$children[[2]]$children[[1]]$children, function(child) {
+    sapply(table4[[3]]$children[[2]]$children[[1]]$children, function(child) {
       "shinyTable" %in% attr(child, "class")
     })
   expect_true(all(all_static_text))

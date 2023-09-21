@@ -1,5 +1,15 @@
-## code to prepare `js_scripts` dataset goes here
-inputChange = readLines("inst/inputChange.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML()
-js_helpers = readLines("inst/helpers.js", warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
-usethis::use_data(inputChange, overwrite = TRUE)
-usethis::use_data(js_helpers, overwrite = TRUE)
+i = 0
+for (filename in list.files("inst")) {
+  func_name = gsub(".js", "", filename)
+  func_value = readLines(paste0("inst/", filename), warn = FALSE) |> paste(collapse = "\n") |> htmltools::HTML() 
+  assign(func_name, func_value, envir = .GlobalEnv)
+  if (i == 0)
+    file.remove("R/js_scripts_documentation.R")
+  cat(glue::glue("#' {func_name} js function
+  #'
+  '{func_name}'
+  \n"), file = "R/js_scripts_documentation.R", sep = "\n", append = i != 0)
+  i = i + 1
+}
+
+usethis::use_data(hideRows, inputChange, searchTable, sortTable, updateInput, compress = "bzip2")

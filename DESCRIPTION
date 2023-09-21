@@ -1,10 +1,9 @@
 Package: shinyTable
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Simple html tables built for shiny + CRUD operations
+Version: 0.1.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Kent", "Orr", , "orrkent@pawpawanalytics.com", role = c("aut", "cre"))
+Description: Generate html tables uing html inputs and an [i,j] grid for a more R native approach to interactive table editing in R's shiny framework.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

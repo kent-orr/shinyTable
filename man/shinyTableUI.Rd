@@ -2,49 +2,41 @@
 % Please edit documentation in R/shiny_functions.R
 \name{shinyTableUI}
 \alias{shinyTableUI}
-\title{UI for an interactive shinyTable module}
+\title{Shiny Table UI}
 \usage{
 shinyTableUI(
   id,
-  add_remove = TRUE,
-  sort = TRUE,
-  add_text = "Add Row",
-  remove_text = "Remove Row",
-  verbose = interactive()
+  shiny_search = TRUE,
+  shiny_sort = TRUE,
+  add_remove = c("Add Row", "Remove Row")
 )
 }
 \arguments{
-\item{id}{The module ID.}
+\item{id}{A string specifying the ID for the UI element.}
 
-\item{add_remove}{Should there be add/remove row buttons.}
+\item{shiny_search}{A logical value indicating whether the search functionality should be enabled via shiny. Defaults to TRUE.}
 
-\item{sort}{Whether to include a sorting option for the table.}
+\item{shiny_sort}{A logical value indicating whether the sorting functionality should be enabled via shiny. Defaults to TRUE.}
 
-\item{add_text}{The label for the "Add Row" button.}
-
-\item{remove_text}{The label for the "Remove Row" button.}
-
-\item{verbose}{Whether to print console output.}
+\item{add_remove}{A character vector with two elements: "Add Row" and "Remove Row". Indicates the labels for the add and remove buttons. Can be NULL to disable the add/remove feature. Defaults to c("Add Row", "Remove Row").}
+}
+\value{
+A tag list that can be added to a Shiny UI.
 }
 \description{
-This function generates the user interface (UI) for an interactive shinyTable module within a Shiny application. It provides options to add and remove rows from the table, and can also display a sorting option.
+This function creates a user interface for a Shiny table with optional features like search, sort, and add/remove rows being implemented in Shiny.
 }
 \examples{
-# Create the UI for a shinyTable module
-shinyTableUI("table_module", add_remove = TRUE, sort = TRUE)
-
-# Use the module in the UI
-ui <- fluidPage(
-  shinyTableUI("table_module", add_remove = TRUE, sort = TRUE),
-  # Other UI elements...
-)
-
-# Define server logic for the UI
-server <- function(input, output, session) {
-  shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
-  # Other server logic...
+\dontrun{
+  ui <- fluidPage(
+    shinyTableUI("tableID", shiny_search = TRUE, shiny_sort = TRUE, add_remove = c("Add Row", "Remove Row"))
+  )
 }
 
-shinyApp(ui, server)
-
+}
+\seealso{
+\code{\link[shiny]{tagList}}
+\code{\link[shiny]{textInput}}
+\code{\link[shiny]{uiOutput}}
+\code{\link[shiny]{actionButton}}
 }

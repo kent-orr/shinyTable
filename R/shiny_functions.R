@@ -1,301 +1,392 @@
-
-
-
-#' UI for an interactive shinyTable module
+#' update a table's input and fire off table input with action: value_change
 #'
-#' This function generates the user interface (UI) for an interactive shinyTable module within a Shiny application. It provides options to add and remove rows from the table, and can also display a sorting option.
-#'
-#' @param id The module ID.
-#' @param add_remove Should there be add/remove row buttons.
-#' @param verbose Whether to print console output.
-#' @param sort Whether to include a sorting option for the table.
-#' @param add_text The label for the "Add Row" button.
-#' @param remove_text The label for the "Remove Row" button.
+#' @inheritParams sortTableR
+#' @param i the i index / attribute
+#' @param j the j index / attribute
+#' @param value the new value to replace the input
 #'
 #' @export
-#'
-#' @examples
-#' # Create the UI for a shinyTable module
-#' shinyTableUI("table_module", add_remove = TRUE, sort = TRUE)
-#'
-#' # Use the module in the UI
-#' ui <- fluidPage(
-#'   shinyTableUI("table_module", add_remove = TRUE, sort = TRUE),
-#'   # Other UI elements...
-#' )
-#'
-#' # Define server logic for the UI
-#' server <- function(input, output, session) {
-#'   shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
-#'   # Other server logic...
-#' }
-#'
-#' shinyApp(ui, server)
-#'
-shinyTableUI <- function(id
-                         , add_remove = TRUE
-                         , sort = TRUE
-                         , add_text = "Add Row"
-                         , remove_text = "Remove Row"
-                         , verbose = interactive()) {
-  ns <- NS(id)
-  tagList(
-    tags$script(js_helpers)
-    , if (add_remove) 
-      tags$div(actionButton(ns("add_row"), add_text, icon = icon("plus"))
-              , actionButton(ns("remove_row"), remove_text, icon = icon("minus"))
-              , if (sort) uiOutput(ns("sort")))
-    , uiOutput(ns("out"))
-    , if (verbose) verbatimTextOutput(ns("console"))
-  )
+updateInputR <- function(tableId, i, j, value) {
+  session$sendCustomMessage("sortTableMessage", list(tableId = tableId
+                                                     , i = i
+                                                     , j = j
+                                                     , value = value))
 }
 
-#' Server logic for a shinyTable instance
+#' Sort Table in a Shiny App
 #'
-#' This module provides the server logic for a shinyTable instance, which allows you to create and manage an editable HTML table within a Shiny application.
-#'
-#' @param id The module ID.
-#' @param x A data frame or reactive data frame containing the data for the table.
-#' @param mode The mode for the table, either "data.frame", "inputs", or "both".
-#' @param table_id An optional ID for the table. If not provided, a default ID will be used.
-#' @param id_cols A numeric vector of column indices to be displayed as static text.
-#' @param sort_cols A numeric vector of column indices to use for sorting the table.
-#' @param col_names A character vector specifying custom column names for the table headers.
-#' @param uid_cols A numeric vector of column indices to be used as unique identifiers for each row.
-#' @param skip_cols A numeric vector of column indices to skip during table generation.
-#' @param type_list A list specifying input types for specific columns.
-#' @param ... Additional arguments (currently not used).
-#'
-#' @return The module server function that defines the behavior of the shinyTable instance.
-#'
-#' @export
-#'
+#' This function sends a custom message to the Shiny session to sort a table based on the given parameters.
+#' 
+#' @param tableId A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.
+#' @param sortDict A list specifying the sorting parameters. The names of the list are the column names and the list values are the sorting directions (e.g., 'asc' for ascending).
+#' @param session A reactive domain (usually from `shiny::getDefaultReactiveDomain()`), representing the Shiny session. Defaults to the current session.
+#' 
+#' @return Invisible NULL.
+#' 
 #' @examples
-#'
-#' # Use the module in the UI
-#' ui <- fluidPage(
-#'   shinyTableUI("table_module"),
-#'   # Other UI elements...
-#' )
-#'
-#' # Define server logic for the UI
-#' server <- function(input, output, session) {
-#'   shinyTableServer("table_module", data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), mode = "inputs")
-#'   # Other server logic...
+#' \dontrun{
+#'   sortTableR("myTableID", list(column1 = 'asc', column2 = 'desc'))
 #' }
-#'
-#' shinyApp(ui, server)
-#'
-shinyTableServer <- function(id
-                             , x
-                             , mode = "inputs"
-                             , table_id = NULL
-                             , id_cols = NULL
-                             , sort_cols = id_cols
-                             , col_names = NULL
-                             , uid_cols = NULL
-                             , skip_cols = NULL
-                             , type_list = NULL
-                             , ...
-) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      
-      init = if(is.reactive(x)) x else reactiveVal(x)
-      current = if(is.reactive(x)) x else reactiveVal(x)
-      
-      output$out <- renderUI({
-        
-        shinyTable(x = init
-                   , mode = mode
-                   , table_id = table_id
-                   , id_cols = id_cols
-                   , uid_cols = uid_cols
-                   , sort_cols = id_cols
-                   , skip_cols = skip_cols
-                   , col_names = col_names
-                   , type_list = type_list
-                   , ns = session$ns
-                   , ...)
-      })
-      
-      output$console <- renderPrint({
-        list(init()
-             , current()
-        )
-      })
-      
-      output$sort <- renderUI({
-        nm = names(init())
-        vals = seq_along(nm)
-        if(length(skip_cols) > 0) {
-          nm <- nm[-skip_cols]
-          vals <- vals[-skip_cols]
-        } else {nm}
-        for (i in seq_along(nm)) {
-          j = which(names(col_names) == nm[i])
-          if (length(j) > 0)
-            nm[i] <- unlist(col_names[j])
-        }
-        
-        ch = vals; names(ch) = nm
-        selectInput(session$ns("sort"), "Sort Table", choices = ch, selected = ch[1], multiple = TRUE, selectize = TRUE)
-      })
-      
-      observeEvent(input$sort, ignoreNULL = TRUE, {
-        # browser()
-        sort_cols = input$sort
-        if(any(is.na(sort_cols))) return()
-        x = sapply(sort_cols, \(x) if(x<0) "desc" else "asc")
-        x = as.list(x)
-        names(x) <- sort_cols
-        session$sendCustomMessage('sort_table', list(tableId = session$ns(table_id), sortingDict = x))
-      })
-      
-      observeEvent(input$add_row, ignoreInit = TRUE, {
-        # browser()
-        init(current())
-        y = init()[1,]
-        classes = sapply(y, class)
-        classes = sapply(classes, `[`, 1)
-        f = \(x) switch(x, 
-                        numeric = 0
-                        , character = "-"
-                        , logical = FALSE
-                        , POSIXct = as.POSIXct(Sys.time()))
-        y = data.frame(lapply(classes, f))
-        if (!is.null(uid_cols)) {
-          # browser()
-          nm = names(uid_cols)
-          vals = uid_cols
-          for (i in seq_along(uid_cols)) {
-            if (!is.null(nm[i]) && nm[i] != "") 
-              y[[i]] = nm[i]
-            else 
-              y[[i]] = uid()
-          }
-        }
-        init(rbind(y, init()))
-        current(init())
-        
-        input_out(list(
-          table = table_id
-          , action = "add_row"
-          , i = y
-        ))
-        
-      })
-      
-      observeEvent(input$remove_row, ignoreInit = TRUE, {
-        ch = 1:nrow(current())
-        names(ch) <- lapply(1:nrow(current()), \(i) {
-          x = current()[i,] |> unlist() |> as.character() 
-          if (!is.null(skip_cols))
-            x = x[-skip_cols] 
-          
-          x = x |>
-            stringr::str_trunc(20, side = "right") |> 
-            stringr::str_pad(20, side = "left", pad = "_") |>
-            paste(collapse = "|")
-          
-          paste(paste0("[", i, "]: "), x)
-        })
-        
-        showModal(
-          modalDialog(
-            title = "Remove"
-            , size = "xl"
-            , tags$div(style='font-family:monospace;',
-                       selectInput(session$ns("remove_choices")
-                                   , label = "Rows to Remove"
-                                   , choices = ch
-                                   , multiple = TRUE
-                                   , selectize = FALSE
-                                   , size = min(15, nrow(current()))
-                                   , width = "100%")
-            )
-            , footer = actionButton(session$ns("remove_submit"), "Submit", icon = icon("close"))
-            , easyClose = TRUE
-          )
-        )
-      })
-      
-      observeEvent(input$remove_submit, ignoreInit = TRUE, {
-        if (is.null(input$remove_choices) || length(input$remove_choices) == 0)
-          return()
-        
-        x = current()
-        i = as.numeric(input$remove_choices)
-        x = x[!i,]
-        
-        input_out(list(
-          table = table_id
-          , action = "remove_row"
-          , i = current()[i,]
-        ))
-        
-        current(x)
-        init(x)
-        
-        removeModal()
-      })
-      
-      observeEvent(input[[table_id]], ignoreNULL = TRUE, {
-        y = current()
-        l = input[[table_id]]
-        i = l$i; j = l$j; value = l$value
-        if (is.null(value)) value = NA
-        y[i][[j]] <- value
-        current(y)
-        # init(x)
-      })
-      
-      input_out <- reactiveVal(list())
-      
-      observeEvent(input[[table_id]], ignoreNULL = TRUE, {
-        x = input[[table_id]]
-        if (is.null(x)) return("nothing")
-        x$table = gsub(paste0(id, "-"), "", x$table)
-        input_out(x)
-      })
-      
-      return_out <- reactive({
-        df = current()
-        if (mode == "inputs") {
-          input_out()
-        } else if (mode == "data.frame") {
-          current()
-        } else {
-          list(inp = input_out(), df = df
-               , current = current, init = init)
-        }
-      })
-      
-      return(return_out)
-      
-    }
-  )
-}
-
-
-
-#' Run a test of the shiny table
+#' 
+#' @seealso 
+#' \code{\link[shiny]{session}}
+#' \code{\link[shiny]{getDefaultReactiveDomain}}
 #' 
 #' @export
-run_test <- function(mode = "data.frame") {
+sortTableR <- function(tableId, sortDict, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage("sortTableMessage", list(tableId = tableId, sortDict = sortDict))
+}
+
+#' Search Table in a Shiny App
+#'
+#' This function sends a custom message to the Shiny session to perform a search within a table based on the provided search string.
+#'
+#' @inheritParams sortTableR
+#' @param searchString A string representing the search query that will be used to filter the table.
+#' 
+#' @return Invisible NULL.
+#' 
+#' @examples
+#' \dontrun{
+#'   searchTableR("myTableID", "searchQuery")
+#' }
+#' 
+#' @seealso 
+#' \code{\link[shiny]{session}}
+#' \code{\link[shiny]{getDefaultReactiveDomain}}
+#' 
+#' @export
+searchTableR <- function(tableId, searchString, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage('searchTableMessage'
+                            , list(tableId = tableId
+                                   , value = searchString))
+}
+
+#' Hide table rows in a Shiny App
+#'
+#' This function sends a custom message to the Shiny session to hide rows from a table
+#' This function is useful because the hidden rows are unaffected by search, and also
+#' allows you to "filter" a table without interrupting the i,j index. 
+#' 
+#' It is important to note that the rows are hidden, not removed, and in any 
+#' case they are rendered before being hidden. Any information
+#' contained in rows is still available as html, and so is not secure. 
+#'
+#' @inheritParams sortTableR
+#' 
+#' @export
+hideRowsR <- function(tableId, hideIndex, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage("hideRowsMessage"
+                            , list(tableId = tableId, hideIndex = hideIndex))
+}
+
+#' Shiny Table UI
+#'
+#' This function creates a user interface for a Shiny table with optional features like search, sort, and add/remove rows being implemented in Shiny.
+#'
+#' @param id A string specifying the ID for the UI element.
+#' @param shiny_search A logical value indicating whether the search functionality should be enabled via shiny. Defaults to TRUE.
+#' @param shiny_sort A logical value indicating whether the sorting functionality should be enabled via shiny. Defaults to TRUE.
+#' @param add_remove A character vector with two elements: "Add Row" and "Remove Row". Indicates the labels for the add and remove buttons. Can be NULL to disable the add/remove feature. Defaults to c("Add Row", "Remove Row").
+#' 
+#' @return A tag list that can be added to a Shiny UI.
+#'
+#' @examples
+#' \dontrun{
+#'   ui <- fluidPage(
+#'     shinyTableUI("tableID", shiny_search = TRUE, shiny_sort = TRUE, add_remove = c("Add Row", "Remove Row"))
+#'   )
+#' }
+#' 
+#' @seealso 
+#' \code{\link[shiny]{tagList}}
+#' \code{\link[shiny]{textInput}}
+#' \code{\link[shiny]{uiOutput}}
+#' \code{\link[shiny]{actionButton}}
+#' 
+#' @export
+shinyTableUI <- function(id
+                         , shiny_search = TRUE
+                         , shiny_sort = TRUE
+                         , add_remove = c("Add Row", "Remove Row")
+) {
+  ns <- NS(id)
+  tagList(
+    # If shiny_search is TRUE, add a text input field for search functionality
+    if (shiny_search) 
+      textInput(ns("search"), "Search", value = "", width = "100%"),
+    
+    # If shiny_sort is TRUE or non-null, add a sorting script and UI output for sorting functionality
+    if (shiny_sort) 
+      tagList(tags$script(sortTable), 
+              uiOutput(ns("sort")) 
+              ),
+    # If add_remove is non-null, add buttons for adding and removing rows
+    if (!is.null(add_remove)) {
+      tags$div(
+        style = "display:flex;justify-content:space-evenly;",
+        actionButton(ns("add"), add_remove[1], icon = icon("plus"), width = "49%"),
+        actionButton(ns("remove"), add_remove[2], icon = icon("minus"), width = "49%")
+      )
+    },
+    
+    # Add UI output for the table
+    uiOutput(ns("table"))
+  )
+}
+
+#' Shiny Table Server Module
+#'
+#' This module serves a Shiny table which supports a variety of functionalities including sorting, searching, 
+#' adding and removing rows, etc. It also manages the user input and output in the server side of a Shiny application.
+#'
+#' @param id A unique ID to identify the module server instance.
+#' @inheritParams shinyTable
+#' @param shiny_search A parameter to define if the search functionality should be done via shiny. NULL means no search, FALSE means search is done via js with table input, TRUE means a shiny input will manage search. 
+#' @param shiny_sort A parameter to define if the sort functionality should be done via shiny. NULL means no search, FALSE means ascending sort is done via js with table input, "asc" or "desc" means a shiny input will manage search. 
+#' @param uid_cols A vector specifying the columns that contain unique ID information. Default is NULL.
+#' @param mode A string specifying the mode of the module ("inputs" or "data.frame" or "both). Default is "inputs".
+#'
+#' @return A reactive expression containing the user inputs or the current data frame based on the specified mode.
+#' 
+#' @export
+#' 
+#' @examples
+#' # To use this module in a Shiny app, you would typically call shinyTableServer in the server function
+#' # and shinyTableUI in the UI function. For example:
+#' # server <- function(input, output, session) {
+#' #   shinyTableServer("table1", reactive({ data.frame(x = 1:10, y = 11:20) }))
+#' # }
+#' # ui <- fluidPage(
+#' #   shinyTableUI("table1")
+#' # )
+#' # shinyApp(ui, server)
+#'
+shinyTableServer = function(id 
+                            , x
+                            , table_id = "tab"
+                            , shiny_search = TRUE
+                            , shiny_sort = "asc"
+                            , id_cols = NULL
+                            , col_names = NULL
+                            , skip_cols = NULL
+                            , type_list = NULL
+                            , uid_cols = NULL
+                            , mode = "inputs"
+) {
+  moduleServer(id, function(input, output, session) {
+    
+    init = if(is.reactive(x)) x else reactiveVal(x)
+    current = if(is.reactive(x)) x else reactiveVal(x)
+    
+    # Table -------------------------------------------------------------------
+    
+    output$table <- renderUI({
+      shinyTable(init()
+                 , table_id = table_id
+                 , searchable = if (is.null(shiny_search)) NULL else !shiny_search
+                 , sortable = if (is.null(shiny_sort)) NULL else if (isFALSE(shiny_sort)) FALSE else shiny_sort
+                 , id_cols = id_cols
+                 , col_names = col_names
+                 , skip_cols = skip_cols
+                 , type_list = type_list
+                 , uid_cols = uid_cols
+                 , ns = session$ns
+      )
+    })
+    
+    # Input Change ------------------------------------------------------------
+    
+    
+    observeEvent(input[[table_id]], ignoreNULL = TRUE, {
+      y = current()
+      l = input[[table_id]]
+      i = l$i; j = l$j; value = l$value
+      if (is.null(value)) value = NA
+      y[i][[j]] <- value
+      current(y)
+      # init(x)
+    })
+    
+    # Add Row -----------------------------------------------------------------
+    
+    observeEvent(input$add, ignoreInit = TRUE, {
+      # browser()
+      init(current())
+      y = init()[1,]
+      classes = sapply(y, class)
+      classes = sapply(classes, `[`, 1)
+      f = \(x) switch(x, 
+                      numeric = 0
+                      , character = "-"
+                      , logical = FALSE
+                      , POSIXct = as.POSIXct(Sys.time()))
+      y = data.frame(lapply(classes, f))
+      if (!is.null(uid_cols)) {
+        # browser()
+        nm = names(uid_cols)
+        vals = uid_cols
+        for (i in seq_along(uid_cols)) {
+          if (!is.null(nm[i]) && nm[i] != "") 
+            y[[i]] = nm[i]
+          else 
+            y[[i]] = uid()
+        }
+      }
+      init(rbind(y, init()))
+      current(init())
+      
+      input_out(list(
+        table = table_id
+        , action = "add_row"
+        , i = y
+      ))
+      
+    })
+    
+    # Remove Row --------------------------------------------------------------
+    
+    observeEvent(input$remove, ignoreInit = TRUE, {
+      ch = 1:nrow(current())
+      names(ch) <- lapply(1:nrow(current()), \(i) {
+        x = current()[i,] |> unlist() |> as.character() 
+        if (!is.null(skip_cols))
+          x = x[-skip_cols] 
+        
+        x = x |>
+          stringr::str_trunc(20, side = "right") |> 
+          stringr::str_pad(20, side = "left", pad = "_") |>
+          paste(collapse = "|")
+        
+        paste(paste0("[", i, "]: "), x)
+      })
+      
+      showModal(
+        modalDialog(
+          title = "Remove"
+          , size = "xl"
+          , tags$div(style='font-family:monospace;',
+                     selectInput(session$ns("remove_choices")
+                                 , label = "Rows to Remove"
+                                 , choices = ch
+                                 , multiple = TRUE
+                                 , selectize = FALSE
+                                 , size = min(15, nrow(current()))
+                                 , width = "100%")
+          )
+          , footer = actionButton(session$ns("remove_submit"), "Submit", icon = icon("close"))
+          , easyClose = TRUE
+        )
+      )
+    })
+    
+    observeEvent(input$remove_submit, ignoreInit = TRUE, {
+      if (is.null(input$remove_choices) || length(input$remove_choices) == 0)
+        return()
+      
+      x = current()
+      i = as.numeric(input$remove_choices)
+      x = x[!i,]
+      
+      input_out(list(
+        table = table_id
+        , action = "remove_row"
+        , i = current()[i,]
+      ))
+      
+      current(x)
+      init(x)
+      
+      removeModal()
+    })
+    
+    # Search ------------------------------------------------------------------
+    
+    
+    observeEvent(input$search, ignoreInit = TRUE, {
+      searchTableR(session$ns(table_id), input$search)
+    })
+    
+    # Sort --------------------------------------------------------------------
+    
+    output$sort <- renderUI({
+      
+      original_names = names(init())
+      if (!is.null(col_names)) {
+        for (i in seq_along(original_names)) {
+          I = which(col_names == original_names[i])
+          if (length(I) == 1)
+            original_names[i] <- names(col_names)[I]
+        }
+      }
+      
+      l = 1:length(original_names); names(l) = original_names
+      
+      if (!is.null(skip_cols)) l = l[-skip_cols]
+      
+      selectInput(session$ns("sort"), "Sort By", l, width = "100%", multiple = TRUE, selected = l[1])
+      
+    })
+    
+    
+    observeEvent(input$sort, {
+      sort_ = if (is.null(input$sort)) 0 else input$sort
+      sortDict = as.list(rep(shiny_sort, max(1, length(sort_))))
+      names(sortDict) = sort_
+      sortTableR(session$ns(table_id), sortDict)
+    })
+    
+    # Return ------------------------------------------------------------------
+    
+    input_out <- reactiveVal(list())
+    
+    observeEvent(input[[table_id]], ignoreNULL = TRUE, {
+      x = input[[table_id]]
+      if (is.null(x)) return("nothing")
+      x$table = gsub(paste0(id, "-"), "", x$table)
+      input_out(x)
+    })
+    
+    return_out <- reactive({
+      df = current()
+      if (mode == "inputs") {
+        input_out()
+      } else if (mode == "data.frame") {
+        current()
+      } else if (mode == "both") {
+        list(inp = input_out(), df = df
+             , current = current, init = init)
+      }
+    })
+    
+    return(return_out)
+    
+  }) # end module
+}
+
+# end server --------------------------------------------------------------
+
+
+run_test <- function(mode = "both", options = "test.mode") {
   ui <- fluidPage(
-    shinyTableUI("a", verbose = TRUE, sort = TRUE)
+    shinyTableUI("module_id", shiny_sort = TRUE, shiny_search = TRUE)
     , verbatimTextOutput("main_console")
   )
   
   server <- function(input, output, session) {
-    y= mtcars[1:3, 1:2]; y$newcol = c(TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
-    x = shinyTableServer("a", y, mode = mode, table_id = "test_table", col_names = list("mpg" = "Miles per Gallon"), id_cols = 1)
+    y = mtcars[1:5, 1:2]; y$newcol = c(TRUE, FALSE, TRUE, FALSE, TRUE); y$datetime = as.POSIXct(Sys.time())
+    y = cbind(list("name" = c("A", "C", "B", "B", "C")), y)
+    x = shinyTableServer("module_id"
+                         , y
+                         , table_id = "tab"
+                         , shiny_sort = "asc"
+                         , shiny_search = TRUE
+                         , col_names = c("MPG" = "mpg")
+    )
     output$main_console <- renderPrint(x())
   }
   
   shiny::shinyApp(ui, server)
 }
 
-if (interactive()) run_test(mode = "inputs")
+# if (interactive()) run_test(mode = "inputs")

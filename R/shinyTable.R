@@ -80,11 +80,65 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              } else {
                NULL
              } # end placeholder
-             , step = if(type == "number") .01 else NULL
+             , step = if(grepl("number", type)) {
+               stp = strsplit(type, "-")[[1]]
+               if (length(stp) == 1) 1 else stp[2]
+             } 
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
-             style='transition: size 5s;position: relative;border:none;')
+             style='transition:5s; position:relative; border:none; width:"100%"',
+             onfocus='inputSelect(this)')
+}
+
+#' Geerate table header row
+#'
+#' @inheritParams shinyTable
+#'
+#' @return a <thhead> tag
+#' @export
+#'
+generate_table_headers <- function(x, col_names, skip_cols) {
+  
+  
+  th <- lapply(seq_along(col_names), function(j) {
+    
+    if (j %in% skip_cols) {
+        NULL
+      } else {
+        tags$th(col_names[j], i = 0, j = j)
+      }
+    }) |>
+    tags$thead(class="shinyTable")
+  
+  return(th)
+}
+
+#' generate the table body
+#'
+#' @inheritParams shinyTable
+#'
+#' @export
+#'
+#' @examples
+generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
+  tb <- tags$tbody(lapply(1:nrow(x), function(i) {
+    
+    tags$tr(
+      lapply(1:ncol(x), function(j) {
+        if (j %in% id_cols) {
+          tags$td(x[i][[j]], i = i, j = j, class="shinyTable")
+        } else if (j %in% skip_cols) {
+          return()
+        } else {
+          tags$td(i = i, j = j,
+                  generate_tags_input(col_types, x, i, j, table_id),
+                  class="shinyTable")
+        }
+      }), class="shinyTable", onclick="trSelect(this)", i = i)
+  }), class="shinyTable")
+  
+  return(tb)
 }
 
 #' Create an editable HTML table
@@ -94,11 +148,17 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 #' @param x A data.frame or reactive object containing the data to be displayed in the table.
 #' @param table_id An optional ID for the table. If not provided, the ID will default to the name of the input data.
 #' @param id_cols A numeric vector of column indices that should be displayed as static text.
-#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses.
-#' @param col_names A character vector specifying custom column names for the table headers. If not provided, column names from the input data will be used.
+#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses. To set step use 'number-<step>' as in 'number-.01'
+#' @param col_names A character vector specifying custom column names for the table headers `new_name = old_name`. If not provided, column names from the input data will be used.
 #' @param skip_cols A numeric vector of column indices to skip during table generation.
+#' @param sortable either "asc" or "desc" or FALSE, giving sort order or no sort at all
+#' @param searchable A boolean to indicate if a search box should be implemented.
 #' @param ns The namespace of the Shiny module if used within a module context.
-#' @param ... Additional arguments (currently not used).
+#' @param ... Additional arguments (see details).
+#'
+#' @details
+#' the ... contains optional pieces of code to be inserted. For now, only the argument scripts, a character vector of js scripts to be run after the table is created. There are 2 events that can be scripted, `trSelect` which is an onclick for the <tr> elements in each table, and `inputSelect` which is an onfocus for the <input> elements.
+#' 
 #'
 #' @return An HTML table with interactive input cells and static text cells based on the provided data and parameters.
 #'
@@ -120,10 +180,21 @@ shinyTable <- function(x,
                        type_list = NULL,
                        col_names = NULL,
                        skip_cols = NULL,
+                       sortable = "asc",
+                       searchable = TRUE,
                        ns = NULL,
                        ...) {
   # browser()
+  
+  if (!missing(...)) {
+    extra = list(...)
+    scripts = lapply(extra[["scripts"]], tags$script)
+  }
+  
   if (shiny::is.reactive(x)) x = x()
+  
+  if (is.null(x) || nrow(x) == 0)
+    return(tagList(tags$p("No Table Data")))
   
   if (is.null(table_id))
     table_id = deparse(substitute(x))
@@ -133,25 +204,16 @@ shinyTable <- function(x,
   
   data.table::setDT(x)
   
-  # Create the table headers (thead)
-  # browser()
   
-  nms = if(!is.null(col_names)) {
-    names(col_names)
-  } else {
-    names(x)
-  }
-    
-  th <- names(x) |> lapply(\(nm) {
-    j = which(nm == names(x))
-    if (j %in% skip_cols) {
-      NULL
-    } else {
-      # browser()
-      i = which(nms == nm)
-      tags$th(if(is.null(col_names) || length(i) == 0) nm else col_names[i], i = 0, j = j)
+  # handle col_names
+  table_names = names(x)
+  if (!is.null(col_names)) {
+    for (i in seq_along(table_names)) {
+      I = which(col_names == table_names[i])
+      if (length(I) == 1)
+        table_names[i] <- names(col_names)[I]
     }
-    }) |> tags$thead()
+  }
   
   # Guess column input types
   col_types = lapply(x, \(y) get_column_input_type(class(y)))
@@ -164,46 +226,55 @@ shinyTable <- function(x,
     }
   }
   
-  # Create the table body (tbody)
-  tb <- tags$tbody(lapply(1:nrow(x), \(i) {
-   
-    tags$tr(
-   
-      lapply(1:ncol(x), \(j) {
-      # Create plain text columns for id cols
-      if (j %in% id_cols) {
-        tags$td(x[i][[j]], i = i, j = j, class="shinyTable")
-      } 
-      # Skip columns specified in skip_cols
-      else if (j %in% skip_cols) {
-        # tags$td(style = "width:0px;")
-      } 
-      # Create input cells for other columns
-      else {
-        tags$td(i = i, j = j,
-          generate_tags_input(col_types, x, i, j, table_id) # end input
-          , class="shinyTable") # end td
-          
-      }
-      
-    }), class="shinyTable", onclick="trSelect(this)", i = i) # end trs
-    
-  }), class="shinyTable"
-  ) # end tbody
+  # create table header
+  th <- generate_table_headers(x, table_names, skip_cols)
   
+  # Create the table body (tbody)
+  tb <- generate_table_body(x, id_cols, col_types, skip_cols, table_id)
   
   # Create colgroups
   tg = tags$colgroup(lapply(setdiff(1:ncol(x), skip_cols), \(j) {
     tags$col(j=j)
   }))
-  
+  # browser()
   # Create the complete table
   tagList(
-    tags$table(tg, th, tb, id = table_id, width="100%")
+    if(!is.null(sortable) && sortable %in% c("asc", "desc")) {
+      tagList(
+        
+        tags$label(`for`=paste0(table_id, "-sort"), "Sort By")
+        , tags$select(name=paste0(table_id, "-sort")
+                      , class = "shinyTable-sort"
+                      , onchange=paste0("(function(x){sortTable('", table_id, "', {[x.value]: '", sortable, "'})})(event.target)")
+                      , lapply(seq_along(table_names), \(j) {
+                        if (!j %in% skip_cols) 
+                          tags$option(table_names[j], value = j)
+                      })
+        )
+      )
+    } # end if sortable
+    , if(searchable) {
+      tagList(
+      tags$label(`for` = paste0(table_id, "-search"), "Search"),
+      tags$input(type="text", class = "shinyTable-search", id = paste0(table_id, "-search"), onkeyup="searchTable(this)")
+      )
+    } # end if searchable
+    
+    , tags$table(tg, th, tb, id = table_id, width="100%")
+    , if (!missing(scripts)) tagList(scripts)
+    , tags$script(hideRows)
     , tags$script(inputChange)
+    , tags$script(searchTable)
+    , tags$script(sortTable)
   )
 }
 
-
-# shinyTable(mtcars[1:2, 1:4], col_names = list("mpg" = "Mile Per Gallon")) |> html_print()
+# if (interactive()) 
+#   htmltools::html_print(
+#     shinyTable(mtcars[1:5, 1:5]
+#                , col_names = c("MPG" = "mpg")
+#                , type_list = list("number-.01" = 2)
+#                , scripts = c("console.log('hey');", "console.log('butt');")
+#                )
+#   )
 
