@@ -2,19 +2,7 @@
 #'
 'hideRows'
 
-#' inputChange js function
+#' hideRows js function
 #'
-'inputChange'
-
-#' searchTable js function
-#'
-'searchTable'
-
-#' sortTable js function
-#'
-'sortTable'
-
-#' updateInput js function
-#'
-'updateInput'
+'hideRows'
 
