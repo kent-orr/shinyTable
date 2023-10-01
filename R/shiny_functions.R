@@ -185,7 +185,7 @@ shinyTableServer = function(id
       shinyTable(init()
                  , table_id = table_id
                  , searchable = if (is.null(shiny_search)) NULL else !shiny_search
-                 , sortable = if (is.null(shiny_sort)) NULL else if (isFALSE(shiny_sort)) FALSE else shiny_sort
+                 , sortable = if (is.null(shiny_sort)) NULL else if (isFALSE(shiny_sort)) "asc" else FALSE
                  , id_cols = id_cols
                  , col_names = col_names
                  , skip_cols = skip_cols
@@ -391,4 +391,4 @@ run_test <- function(mode = "both", options = "test.mode") {
   shiny::shinyApp(ui, server)
 }
 
-# if (interactive()) run_test(mode = "inputs")
+# if (interactive()) run_test(mode = "interactive")
