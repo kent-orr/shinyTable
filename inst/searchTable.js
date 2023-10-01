@@ -36,7 +36,7 @@ function searchTable(x) {
 function searchTableMessage(x) {
   var filter, table, tr, td, i, j, txtValue;
   filter = x.value.toUpperCase();
-  table = document.getElementById(x.table_id);
+  table = document.getElementById(x.tableId);
   tr = table.getElementsByTagName('tr');
 
   if (filter === "") {
