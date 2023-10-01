@@ -6,8 +6,8 @@
 #' @param value the new value to replace the input
 #'
 #' @export
-updateInputR <- function(tableId, i, j, value) {
-  session$sendCustomMessage("sortTableMessage", list(tableId = tableId
+updateInputR <- function(tableId, i, j, value, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage("updateInputMessage", list(tableId = tableId
                                                      , i = i
                                                      , j = j
                                                      , value = value))
@@ -203,6 +203,8 @@ shinyTableServer = function(id
       l = input[[table_id]]
       i = l$i; j = l$j; value = l$value
       if (is.null(value)) value = NA
+      if (is.numeric(y[[j]]) && value == "") {value = 0}
+      browser()
       y[i][[j]] <- value
       current(y)
       # init(x)
