@@ -35,5 +35,5 @@ function sortTable(tableId, sortDict) {
 }
 
 Shiny.addCustomMessageHandler('sortTableMessage', function(message) {
-  sortTable(message.tableId, message.sortDict)
+  sortTable(message.tableId, message.sortDict);
 });

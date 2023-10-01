@@ -6,8 +6,8 @@
 #' @param value the new value to replace the input
 #'
 #' @export
-updateInputR <- function(tableId, i, j, value) {
-  session$sendCustomMessage("sortTableMessage", list(tableId = tableId
+updateInputR <- function(tableId, i, j, value, session = getDefaultReactiveDomain()) {
+  session$sendCustomMessage("updateInputMessage", list(tableId = tableId
                                                      , i = i
                                                      , j = j
                                                      , value = value))
@@ -185,7 +185,7 @@ shinyTableServer = function(id
       shinyTable(init()
                  , table_id = table_id
                  , searchable = if (is.null(shiny_search)) NULL else !shiny_search
-                 , sortable = if (is.null(shiny_sort)) NULL else if (isFALSE(shiny_sort)) FALSE else shiny_sort
+                 , sortable = if (is.null(shiny_sort)) NULL else if (isFALSE(shiny_sort)) "asc" else FALSE
                  , id_cols = id_cols
                  , col_names = col_names
                  , skip_cols = skip_cols
@@ -203,6 +203,8 @@ shinyTableServer = function(id
       l = input[[table_id]]
       i = l$i; j = l$j; value = l$value
       if (is.null(value)) value = NA
+      if (is.numeric(y[[j]]) && value == "") {value = 0}
+      browser()
       y[i][[j]] <- value
       current(y)
       # init(x)
@@ -389,4 +391,4 @@ run_test <- function(mode = "both", options = "test.mode") {
   shiny::shinyApp(ui, server)
 }
 
-# if (interactive()) run_test(mode = "inputs")
+# if (interactive()) run_test(mode = "interactive")

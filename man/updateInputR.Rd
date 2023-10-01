@@ -4,7 +4,7 @@
 \alias{updateInputR}
 \title{update a table's input and fire off table input with action: value_change}
 \usage{
-updateInputR(tableId, i, j, value)
+updateInputR(tableId, i, j, value, session = getDefaultReactiveDomain())
 }
 \arguments{
 \item{tableId}{A string specifying the ID of the table that needs to be sorted. If used in a module you may need to add the namespace.}
@@ -14,6 +14,8 @@ updateInputR(tableId, i, j, value)
 \item{j}{the j index / attribute}
 
 \item{value}{the new value to replace the input}
+
+\item{session}{A reactive domain (usually from \code{shiny::getDefaultReactiveDomain()}), representing the Shiny session. Defaults to the current session.}
 }
 \description{
 update a table's input and fire off table input with action: value_change
