@@ -5,6 +5,6 @@ function updateInput(tableId, i, j, value) {
   return;
 }
 
-Shiny.addCustomMessagehandler("updateInputMesssage", function(message) {
-  updateInput(message.tableId, message.i, message.j, message.value)
+Shiny.addCustomMessageHandler("updateInputMessage", function(message) {
+  updateInput(message.tableId, message.i, message.j, message.value);
 })
