@@ -8,8 +8,8 @@ for (filename in list.files("inst")) {
   cat(glue::glue("#' {func_name} js function
   #'
   '{func_name}'
-  \n"), file = "R/js_scripts_documentation.R", sep = "\n", append = i != 0)
+  \n"), file = "R/js_scripts_documentation.R", sep = "\n", append = TRUE)
   i = i + 1
 }
 
-usethis::use_data(hideRows, inputChange, searchTable, sortTable, updateInput, compress = "bzip2")
+usethis::use_data(hideRows, inputChange, searchTable, sortTable, updateInput, compress = "bzip2", overwrite = TRUE)
