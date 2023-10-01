@@ -204,7 +204,6 @@ shinyTableServer = function(id
       i = l$i; j = l$j; value = l$value
       if (is.null(value)) value = NA
       if (is.numeric(y[[j]]) && value == "") {value = 0}
-      browser()
       y[i][[j]] <- value
       current(y)
       # init(x)
