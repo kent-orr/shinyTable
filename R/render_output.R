@@ -52,14 +52,14 @@ shinyTableOutput <- function(id) {
 #' @export
 renderShinyTable <- function(expr, env = parent.frame(), quoted = FALSE) {
   
-  # Convert the expression to a function
+  # Convert the expression to a reactive expression
   func <- shiny::exprToFunction(expr, env, quoted)
+  reactive_func <- shiny::reactive(func())
   
-  # Evaluate the function to get the table element x
-  x <- func()
-  
-  # Return a function that renders the table and runs the inputScript
-  return(\() {
+  return(function() {
+    # Fetch the table using the reactive function
+    x <- reactive_func()
+    
     list(
       table_HTML = htmltools::doRenderTags(x[which(sapply(x, \(y) y[["name"]]) == "table")]),
       inputScript = inputChange
