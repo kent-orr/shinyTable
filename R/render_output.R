@@ -50,7 +50,7 @@ shinyTableOutput <- function(id) {
 #' @param quoted Is \code{expr} a quoted expression (with \code{quote()})? This is useful if you want to save an expression in a variable.
 #' @return A function that returns a list containing the HTML of the table and any additional input scripts.
 #' @export
-rendershinyTable <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderShinyTable <- function(expr, env = parent.frame(), quoted = FALSE) {
   
   # Convert the expression to a function
   func <- shiny::exprToFunction(expr, env, quoted)
