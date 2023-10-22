@@ -270,12 +270,12 @@ shinyTable <- function(x,
   )
 }
 
-if (interactive())
-  htmltools::html_print(
-    shinyTable(mtcars[1:5, 1:5]
-               , col_names = c("MPG" = "mpg")
-               , type_list = list("number-.01" = 2)
-               , scripts = c("console.log('hey');", "console.log('butt');")
-               )
-  )
+# if (interactive())
+#   htmltools::html_print(
+#     shinyTable(mtcars[1:5, 1:5]
+#                , col_names = c("MPG" = "mpg")
+#                , type_list = list("number-.01" = 2)
+#                , scripts = c("console.log('hey');", "console.log('butt');")
+#                )
+#   )
 
