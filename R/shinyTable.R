@@ -87,7 +87,7 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
              , value = value,
              i = i, j = j, class = "shinyTable-input", table = table_id,
              size = size,
-             style='transition:5s; position:relative; border:none; width:"100%"',
+             style='transition:5s; position:relative; border:none; width:100%',
              onfocus='inputSelect(this)')
 }
 
