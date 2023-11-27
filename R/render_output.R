@@ -61,7 +61,7 @@ renderShinyTable <- function(expr, env = parent.frame(), quoted = FALSE) {
     x <- reactive_func()
     
     list(
-      table_HTML = htmltools::doRenderTags(x[which(sapply(x, \(y) y[["name"]]) == "table")]),
+      table_HTML = htmltools::doRenderTags(x),
       inputScript = inputChange
     )
   })
