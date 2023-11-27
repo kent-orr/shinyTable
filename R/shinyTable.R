@@ -43,20 +43,20 @@ get_column_input_type <- function(column_class) {
 
 #' Generate input tags based on column types.
 #'
-#' This function generates input tags based on the column types specified in the \code{col_types} argument.
-#' The generated input tag is determined by the column type \code{col_types[[j]]} and is adjusted
+#' This function generates input tags based on the column types specified in the \code{cols_type} argument.
+#' The generated input tag is determined by the column type \code{cols_type[[j]]} and is adjusted
 #' according to the specific conditions for certain types.
 #'
-#' @param col_types A character vector specifying the types of columns.
+#' @param cols_type A character vector specifying the types of columns.
 #' @param x A data structure containing the data for the specified column.
 #' @param i An integer index indicating the row number.
 #' @param j An integer index indicating the column number.
 #' @param table_id A character string representing the table identifier.
 #' 
 #' @export
-generate_tags_input <- function(col_types, x, i, j, table_id) {
+generate_tags_input <- function(cols_type, x, i, j, table_id) {
   # browser()
-  type = col_types[[j]]
+  type = cols_type[[j]]
   data.table::setDT(x)
   value <- if (type == "datetime-local") {
     lubridate::format_ISO8601(x[i][[j]])
@@ -98,15 +98,15 @@ generate_tags_input <- function(col_types, x, i, j, table_id) {
 #' @return a <thhead> tag
 #' @export
 #'
-generate_table_headers <- function(x, col_names, skip_cols) {
+generate_table_headers <- function(x, cols_name, cols_skip) {
   
   
-  th <- lapply(seq_along(col_names), function(j) {
+  th <- lapply(seq_along(cols_name), function(j) {
     
-    if (j %in% skip_cols) {
+    if (j %in% cols_skip) {
         NULL
       } else {
-        tags$th(col_names[j], i = 0, j = j)
+        tags$th(cols_name[j], i = 0, j = j)
       }
     }) |>
     tags$thead(class="shinyTable")
@@ -121,18 +121,18 @@ generate_table_headers <- function(x, col_names, skip_cols) {
 #' @export
 #'
 #' @examples
-generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
+generate_table_body <- function(x, cols_display, cols_type, cols_skip, table_id) {
   tb <- tags$tbody(lapply(1:nrow(x), function(i) {
     
     tags$tr(
       lapply(1:ncol(x), function(j) {
-        if (j %in% id_cols) {
+        if (j %in% cols_display) {
           tags$td(x[i][[j]], i = i, j = j, class="shinyTable")
-        } else if (j %in% skip_cols) {
+        } else if (j %in% cols_skip) {
           return()
         } else {
           tags$td(i = i, j = j,
-                  generate_tags_input(col_types, x, i, j, table_id),
+                  generate_tags_input(cols_type, x, i, j, table_id),
                   class="shinyTable")
         }
       }), class="shinyTable", onclick="trSelect(this)", i = i)
@@ -147,12 +147,10 @@ generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
 #'
 #' @param x A data.frame or reactive object containing the data to be displayed in the table.
 #' @param table_id An optional ID for the table. If not provided, the ID will default to the name of the input data.
-#' @param id_cols A numeric vector of column indices that should be displayed as static text.
-#' @param type_list A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses. To set step use 'number-<step>' as in 'number-.01'
-#' @param col_names A character vector specifying custom column names for the table headers `new_name = old_name`. If not provided, column names from the input data will be used.
-#' @param skip_cols A numeric vector of column indices to skip during table generation.
-#' @param sortable either "asc" or "desc" or FALSE, giving sort order or no sort at all
-#' @param searchable A boolean to indicate if a search box should be implemented.
+#' @param cols_display A numeric vector of column indices that should be displayed as static text.
+#' @param cols_type A list specifying input types for specific columns. The format should be `list(input_type = c(column_indices))`. Column input types are guessed using `shinyTable:::get_column_input_type`, and this argument can be used to override the guesses. To set step use 'number-<step>' as in 'number-.01'
+#' @param cols_name A character vector specifying custom column names for the table headers `new_name = old_name`. If not provided, column names from the input data will be used.
+#' @param cols_skip A numeric vector of column indices to skip during table generation.
 #' @param ns The namespace of the Shiny module if used within a module context.
 #' @param ... Additional arguments (see details).
 #'
@@ -169,19 +167,17 @@ generate_table_body <- function(x, id_cols, col_types, skip_cols, table_id) {
 #' shinyTable(data.frame(A = 1:5, B = 6:10))
 #'
 #' # Generate a table with custom column names and input types
-#' shinyTable(data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), col_names = c("Person", "Years"), type_list = list(text = 1, numeric = 2))
+#' shinyTable(data.frame(Name = c("Alice", "Bob"), Age = c(25, 30)), cols_name = c("Person", "Years"), cols_type = list(text = 1, numeric = 2))
 #'
 #' # Generate a table with specified static text columns and skipped columns
-#' shinyTable(data.frame(ID = 1:3, Name = c("Alice", "Bob", "Carol"), Value = c(10, 20, 30)), id_cols = 1, skip_cols = 3)
+#' shinyTable(data.frame(ID = 1:3, Name = c("Alice", "Bob", "Carol"), Value = c(10, 20, 30)), cols_display = 1, cols_skip = 3)
 #'
 shinyTable <- function(x,
                        table_id = NULL,
-                       id_cols = 1,
-                       type_list = NULL,
-                       col_names = NULL,
-                       skip_cols = NULL,
-                       sortable = "asc",
-                       searchable = TRUE,
+                       cols_display = NULL,
+                       cols_type = NULL,
+                       cols_name = NULL,
+                       cols_skip = NULL,
                        ns = NULL,
                        ...) {
   
@@ -206,77 +202,53 @@ shinyTable <- function(x,
   data.table::setDT(x)
   
   
-  # handle col_names
+  # handle cols_name
   table_names = names(x)
-  if (!is.null(col_names)) {
+  if (!is.null(cols_name)) {
     for (i in seq_along(table_names)) {
-      I = which(col_names == table_names[i])
+      I = which(cols_name == table_names[i])
       if (length(I) == 1)
-        table_names[i] <- names(col_names)[I]
+        table_names[i] <- names(cols_name)[I]
     }
   }
   
   # Guess column input types
-  col_types = lapply(x, \(y) get_column_input_type(class(y)))
+  cols_type = lapply(x, \(y) get_column_input_type(class(y)))
   
-  # Override guessed column types with the ones specified in type_list
-  if (!is.null(type_list)) {
-    nm = names(type_list)
-    for (i in seq_along(type_list)) {
-      col_types[type_list[[i]]] <- nm[i]
+  # Override guessed column types with the ones specified in cols_type
+  if (!is.null(cols_type)) {
+    nm = names(cols_type)
+    for (i in seq_along(cols_type)) {
+      cols_type[cols_type[[i]]] <- nm[i]
     }
   }
   
   # create table header
-  th <- generate_table_headers(x, table_names, skip_cols)
+  th <- generate_table_headers(x, table_names, cols_skip)
   
   # Create the table body (tbody)
-  tb <- generate_table_body(x, id_cols, col_types, skip_cols, table_id)
+  tb <- generate_table_body(x, cols_display, cols_type, cols_skip, table_id)
   
   # Create colgroups
-  tg = tags$colgroup(lapply(setdiff(1:ncol(x), skip_cols), \(j) {
+  tg = tags$colgroup(lapply(setdiff(1:ncol(x), cols_skip), \(j) {
     tags$col(j=j)
   }))
   # browser()
   # Create the complete table
-  tagList(
-    if(!is.null(sortable) && sortable %in% c("asc", "desc")) {
-      tagList(
-        
-        tags$label(`for`=paste0(table_id, "-sort"), "Sort By")
-        , tags$select(name=paste0(table_id, "-sort")
-                      , class = "shinyTable-sort"
-                      , onchange=paste0("(function(x){sortTable('", table_id, "', {[x.value]: '", sortable, "'})})(event.target)")
-                      , lapply(seq_along(table_names), \(j) {
-                        if (!j %in% skip_cols) 
-                          tags$option(table_names[j], value = j)
-                      })
-        )
-      )
-    } # end if sortable
-    , if(searchable) {
-      tagList(
-      tags$label(`for` = paste0(table_id, "-search"), "Search"),
-      tags$input(type="text", class = "shinyTable-search", id = paste0(table_id, "-search"), onkeyup="searchTable(this)")
-      )
-    } # end if searchable
-    
-    , tags$table(tg, th, tb, id = table_id, width="100%")
-    , if (!is.null(scripts)) tagList(scripts)
-    , tags$script(hideRows)
-    , tags$script(inputChange)
-    , tags$script(searchTable)
-    , tags$script(sortTable)
-  )
+  tags$table(tg, th, tb, id = table_id, width="100%")
 }
 
-if (interactive())
-  htmltools::html_print(
-    shinyTable(mtcars[1:5, 1:5]
-               , col_names = c("MPG" = "mpg")
-               , type_list = list("number-.01" = 2)
-               , skip_cols = 3:4
-               , scripts = c("console.log('hey');", "console.log('butt');")
-               )
+
+if (interactive()) {
+  x = shinyTable(mtcars[1:5, 1:5]
+                 , cols_name = c("MPG" = "mpg")
+                 , cols_type = list("number-.01" = 2)
+                 , cols_skip = 3:4
+                 , scripts = c("console.log('hey');", "console.log('butt');")
   )
+  
+  htmltools::html_print(x)
+  
+}
+
 
